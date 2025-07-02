@@ -35,8 +35,8 @@ class MinistryPlatformOAuth2Api {
                 name: 'accessTokenUrl',
                 type: 'string',
                 default: '',
-                placeholder: 'https://your-instance.ministryplatform.com/ministryplatformapi/oauth/connect/token',
-                description: 'Format: [Environment URL]/ministryplatformapi/oauth/connect/token',
+                placeholder: 'https://your-instance.ministryplatform.com/oauth/connect/token',
+                description: 'Format: [Environment URL]/oauth/connect/token (no /ministryplatformapi)',
             },
             {
                 displayName: 'Scope',
