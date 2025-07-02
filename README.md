@@ -68,20 +68,70 @@ npm install -g .
 
 ## Operations
 
-### Resources
+This node provides direct access to MinistryPlatform's table API, allowing you to work with any table in your MinistryPlatform instance.
 
-- **Contact**: Manage church member and visitor contact information
-- **Event**: Handle church events and registrations  
-- **Donation**: Track and manage donations
-- **Table**: Generic operations on any MinistryPlatform table
+### Table Operations Available
 
-### Operations Available
-
-- **Create**: Add new records
+- **Create**: Add new records to any table
 - **Get**: Retrieve a specific record by ID
-- **Get All**: Retrieve multiple records with optional filtering
+- **List**: Retrieve multiple records with filtering and pagination
 - **Update**: Modify existing records
 - **Delete**: Remove records
+
+### Table Configuration
+
+For all operations, you need to specify:
+- **Table Name**: The exact name of the MinistryPlatform table (e.g., `Contacts`, `Events`, `Donations`, `Households`)
+
+### List Operation Parameters
+
+The List operation supports these query parameters:
+
+- **select**: Comma-separated list of fields to return (e.g., `Contact_ID,Display_Name,Email_Address`)
+- **filter**: MS SQL WHERE clause syntax (e.g., `Contact_ID > 1000`, `Email_Address='user@example.com'`)
+- **orderby**: Field to sort by (e.g., `Display_Name asc`, `Created_Date desc`)
+- **groupby**: Field to group results by
+- **having**: Having clause for grouped results
+- **top**: Maximum number of records to return (e.g., `100`)
+- **skip**: Number of records to skip for pagination (e.g., `50`)
+- **distinct**: Return only unique records (boolean)
+- **userId**: User ID for context-sensitive queries
+- **globalFilterId**: Apply a global filter by ID
+
+### MS SQL Filter Examples
+
+```
+# String equality (use single quotes)
+Email_Address='john@example.com'
+
+# String contains (LIKE with wildcards)
+Display_Name LIKE '%Smith%'
+
+# Number comparison
+Contact_ID > 1000
+
+# Date comparison  
+Created_Date >= '2024-01-01'
+
+# Multiple conditions
+Contact_ID > 1000 AND Email_Address LIKE '%gmail.com%'
+
+# Null checks
+Email_Address IS NOT NULL
+
+# IN clause
+Contact_ID IN (1001, 1002, 1003)
+```
+
+### Common Table Names
+
+- `Contacts` - Contact records
+- `Events` - Event records
+- `Donations` - Donation records
+- `Households` - Household records
+- `Participants` - Event participants
+- `Groups` - Group records
+- `Users` - User accounts
 
 ## Credentials
 
@@ -115,6 +165,17 @@ In n8n, create new MinistryPlatform OAuth2 API credentials with:
 - Check redirect URI matches n8n instance URL
 - Ensure MinistryPlatform OAuth app is configured correctly
 
+### Filter Issues
+- Use single quotes for string values: `Email_Address='user@example.com'`
+- Use standard SQL operators: `=`, `!=`, `>`, `<`, `>=`, `<=`
+- Use `LIKE '%text%'` for contains, not `contains()`
+- Check field names match exactly (case-sensitive)
+- Use `AND`/`OR` for multiple conditions, not `and`/`or`
+
+### Query Parameter Issues
+- **Top parameter ignored**: If using List operation, ensure you're setting the `top` parameter in the Additional Fields, not expecting automatic pagination
+- **All records returned**: The `top` parameter is now respected - if not set, all records will be paginated and returned
+
 ### Build Issues
 - Run `npm install` before `npm run build`
 - Check for TypeScript compilation errors
@@ -132,7 +193,19 @@ In n8n, create new MinistryPlatform OAuth2 API credentials with:
 
 Tested with n8n version 1.0+
 
+## Testing
+
+### Postman Collection
+
+A Postman collection is included in the `postman/` directory for testing the MinistryPlatform API directly:
+
+- **Collection**: `postman/MinistryPlatform-API.postman_collection.json`
+- **Documentation**: `postman/README.md`
+
+The collection includes examples for all operations (Create, Get, List, Update, Delete) with proper OAuth2 configuration.
+
 ## Resources
 
 * [n8n community nodes documentation](https://docs.n8n.io/integrations/community-nodes/)
 * [MinistryPlatform Developer Resources](https://help.acst.com/en/ministryplatform/developer-resources/developer-resources)
+* [MinistryPlatform Tables API Documentation](https://help.acst.com/en/ministryplatform/developer-resources/developer-resources/rest-api/tables)

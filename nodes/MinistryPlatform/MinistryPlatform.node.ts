@@ -146,7 +146,7 @@ export class MinistryPlatform implements INodeType {
 						name: 'filter',
 						type: 'string',
 						default: '',
-						description: 'OData filter expression (e.g., "Contact_ID eq 1")',
+						description: 'MS SQL WHERE clause syntax (e.g., "Contact_ID > 1000", "Email_Address=\'user@example.com\'")',
 						noDataExpression: true,
 					},
 					{

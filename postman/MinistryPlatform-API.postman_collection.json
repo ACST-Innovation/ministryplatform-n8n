@@ -130,8 +130,8 @@
 					"query": [
 						{
 							"key": "$filter",
-							"value": "Contact_ID gt 0",
-							"description": "OData filter expression",
+							"value": "Contact_ID > 0",
+							"description": "MS SQL WHERE clause syntax",
 							"disabled": true
 						},
 						{
@@ -197,8 +197,8 @@
 					"query": [
 						{
 							"key": "$filter",
-							"value": "Contact_ID gt 1000",
-							"description": "OData filter expression"
+							"value": "Contact_ID > 1000",
+							"description": "MS SQL WHERE clause syntax"
 						},
 						{
 							"key": "$select",

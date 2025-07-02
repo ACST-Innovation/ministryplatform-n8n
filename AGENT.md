@@ -64,18 +64,50 @@ n8n-mp/
 - Swagger UI: https://mpi.ministryplatform.com/ministryplatformapi/swagger/ui/index
 - Note: Firefox may be already authenticated if accessing swagger
 
-### Supported Resources
-- **Contacts** (table: Contacts)
-- **Events** (table: Events)  
-- **Donations** (table: Donations)
-- **Generic Tables** (any MinistryPlatform table)
-
-### Operations
+### Supported Operations
 - CREATE: POST `/tables/{tableName}`
 - GET: GET `/tables/{tableName}/{recordId}`
-- GET ALL: GET `/tables/{tableName}` (with OData query parameters)
+- LIST: GET `/tables/{tableName}` (with query parameters)
 - UPDATE: PUT `/tables/{tableName}/{recordId}`
 - DELETE: DELETE `/tables/{tableName}/{recordId}`
+
+### Query Parameters for LIST Operation
+The MinistryPlatform API uses MS SQL syntax for query parameters, NOT OData:
+
+- **$filter**: MS SQL WHERE clause syntax (e.g., `Contact_ID > 1000`, `Email_Address='user@example.com'`)
+- **$select**: Comma-separated field list (e.g., `Contact_ID,Display_Name,Email_Address`)
+- **$orderby**: SQL ORDER BY syntax (e.g., `Display_Name ASC`, `Created_Date DESC`)
+- **$groupby**: SQL GROUP BY syntax
+- **$having**: SQL HAVING clause
+- **$top**: Limit number of results
+- **$skip**: Skip number of results for pagination
+- **$distinct**: Return distinct records (boolean)
+- **$userId**: User context for queries
+- **$globalFilterId**: Apply global filter by ID
+
+### Filter Syntax Examples (MS SQL, not OData)
+```sql
+-- String equality
+Email_Address='patrick@acst.com'
+
+-- String contains
+Display_Name LIKE '%Smith%'
+
+-- Number comparison
+Contact_ID > 1000
+
+-- Date comparison
+Created_Date >= '2024-01-01'
+
+-- Multiple conditions
+Contact_ID > 1000 AND Email_Address LIKE '%gmail.com%'
+
+-- Null checks
+Email_Address IS NOT NULL
+
+-- IN clause
+Contact_ID IN (1001, 1002, 1003)
+```
 
 ## Code Style & Conventions
 - TypeScript strict mode enabled

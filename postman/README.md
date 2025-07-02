@@ -63,31 +63,36 @@ This collection provides examples for interacting with the MinistryPlatform REST
 - `Participants` - Event participants
 - `Groups` - Group records
 
-## OData Query Examples
+## MS SQL Query Examples
 
 ### Filter by ID range
 ```
-$filter=Contact_ID gt 1000 and Contact_ID lt 2000
+$filter=Contact_ID > 1000 AND Contact_ID < 2000
 ```
 
 ### Filter by date
 ```
-$filter=Created_Date ge 2024-01-01T00:00:00Z
+$filter=Created_Date >= '2024-01-01'
 ```
 
 ### Filter by text field
 ```
-$filter=contains(Display_Name,'Smith')
+$filter=Display_Name LIKE '%Smith%'
 ```
 
 ### Combine multiple filters
 ```
-$filter=Contact_ID gt 1000 and contains(Email_Address,'@gmail.com')
+$filter=Contact_ID > 1000 AND Email_Address LIKE '%@gmail.com%'
+```
+
+### String equality
+```
+$filter=Email_Address='patrick@acst.com'
 ```
 
 ## Notes
 
 - All requests require OAuth2 authentication
 - Replace `{table_name}` and `{record_id}` with actual values or use the collection variables
-- The API follows OData conventions for querying
+- The API uses MS SQL syntax for query parameters, not OData
 - Error responses will include details about what went wrong
