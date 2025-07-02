@@ -3,205 +3,203 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.MinistryPlatform = void 0;
 const GenericFunctions_1 = require("./GenericFunctions");
 class MinistryPlatform {
-    constructor() {
-        this.description = {
-            displayName: 'MinistryPlatform',
-            name: 'ministryPlatform',
-            icon: 'file:ministryplatform.svg',
-            group: ['transform'],
-            version: 1,
-            subtitle: '={{$parameter["operation"] + ": " + $parameter["tableName"]}}',
-            description: 'Consume MinistryPlatform API',
-            defaults: {
-                name: 'MinistryPlatform',
+    description = {
+        displayName: 'MinistryPlatform',
+        name: 'ministryPlatform',
+        icon: 'file:ministryplatform.svg',
+        group: ['transform'],
+        version: 1,
+        subtitle: '={{$parameter["operation"] + ": " + $parameter["tableName"]}}',
+        description: 'Consume MinistryPlatform API',
+        defaults: {
+            name: 'MinistryPlatform',
+        },
+        inputs: ["main" /* NodeConnectionType.Main */],
+        outputs: ["main" /* NodeConnectionType.Main */],
+        credentials: [
+            {
+                name: 'ministryPlatformOAuth2Api',
+                required: true,
             },
-            inputs: ["main" /* NodeConnectionType.Main */],
-            outputs: ["main" /* NodeConnectionType.Main */],
-            credentials: [
-                {
-                    name: 'ministryPlatformOAuth2Api',
-                    required: true,
-                },
-            ],
-            properties: [
-                {
-                    displayName: 'Operation',
-                    name: 'operation',
-                    type: 'options',
-                    noDataExpression: true,
-                    options: [
-                        {
-                            name: 'Create',
-                            value: 'create',
-                            action: 'Create a record',
-                        },
-                        {
-                            name: 'Get',
-                            value: 'get',
-                            action: 'Get a record',
-                        },
-                        {
-                            name: 'List',
-                            value: 'list',
-                            action: 'List records',
-                        },
-                        {
-                            name: 'Update',
-                            value: 'update',
-                            action: 'Update a record',
-                        },
-                        {
-                            name: 'Delete',
-                            value: 'delete',
-                            action: 'Delete a record',
-                        },
-                    ],
-                    default: 'get',
-                },
-                {
-                    displayName: 'Table Name',
-                    name: 'tableName',
-                    type: 'string',
-                    default: '',
-                    placeholder: 'Contacts',
-                    description: 'Name of the MinistryPlatform table to interact with',
-                },
-                {
-                    displayName: 'Record ID',
-                    name: 'recordId',
-                    type: 'string',
-                    displayOptions: {
-                        show: {
-                            operation: ['get', 'update', 'delete'],
-                        },
+        ],
+        properties: [
+            {
+                displayName: 'Operation',
+                name: 'operation',
+                type: 'options',
+                noDataExpression: true,
+                options: [
+                    {
+                        name: 'Create',
+                        value: 'create',
+                        action: 'Create a record',
                     },
-                    default: '',
-                    description: 'ID of the record to retrieve, update, or delete',
-                },
-                {
-                    displayName: 'Fields',
-                    name: 'fields',
-                    placeholder: 'Add Field',
-                    type: 'fixedCollection',
-                    typeOptions: {
-                        multipleValues: true,
+                    {
+                        name: 'Get',
+                        value: 'get',
+                        action: 'Get a record',
                     },
-                    displayOptions: {
-                        show: {
-                            operation: ['create', 'update'],
-                        },
+                    {
+                        name: 'List',
+                        value: 'list',
+                        action: 'List records',
                     },
-                    default: {},
-                    options: [
-                        {
-                            name: 'field',
-                            displayName: 'Field',
-                            values: [
-                                {
-                                    displayName: 'Field Name',
-                                    name: 'name',
-                                    type: 'string',
-                                    default: '',
-                                    description: 'Name of the field',
-                                },
-                                {
-                                    displayName: 'Field Value',
-                                    name: 'value',
-                                    type: 'string',
-                                    default: '',
-                                    description: 'Value of the field',
-                                },
-                            ],
-                        },
-                    ],
-                },
-                {
-                    displayName: 'Additional Fields',
-                    name: 'additionalFields',
-                    type: 'collection',
-                    placeholder: 'Add Field',
-                    default: {},
-                    displayOptions: {
-                        show: {
-                            operation: ['list'],
-                        },
+                    {
+                        name: 'Update',
+                        value: 'update',
+                        action: 'Update a record',
                     },
-                    options: [
-                        {
-                            displayName: 'Select',
-                            name: 'select',
-                            type: 'string',
-                            default: '',
-                            description: 'Comma-separated list of fields to select',
-                        },
-                        {
-                            displayName: 'Filter',
-                            name: 'filter',
-                            type: 'string',
-                            default: '',
-                            description: 'MS SQL WHERE clause syntax (e.g., "Contact_ID > 1000", "Email_Address=\'user@example.com\'")',
-                        },
-                        {
-                            displayName: 'Order By',
-                            name: 'orderby',
-                            type: 'string',
-                            default: '',
-                            description: 'Field to order results by (e.g., "Display_Name asc")',
-                        },
-                        {
-                            displayName: 'Group By',
-                            name: 'groupby',
-                            type: 'string',
-                            default: '',
-                            description: 'Field to group results by',
-                        },
-                        {
-                            displayName: 'Having',
-                            name: 'having',
-                            type: 'string',
-                            default: '',
-                            description: 'Having clause for grouped results',
-                        },
-                        {
-                            displayName: 'Top',
-                            name: 'top',
-                            type: 'number',
-                            default: 100,
-                            description: 'Maximum number of records to return',
-                        },
-                        {
-                            displayName: 'Skip',
-                            name: 'skip',
-                            type: 'number',
-                            default: 0,
-                            description: 'Number of records to skip for pagination',
-                        },
-                        {
-                            displayName: 'Distinct',
-                            name: 'distinct',
-                            type: 'boolean',
-                            default: false,
-                            description: 'Return only distinct records',
-                        },
-                        {
-                            displayName: 'User ID',
-                            name: 'userId',
-                            type: 'number',
-                            default: 0,
-                            description: 'User ID for context-sensitive queries',
-                        },
-                        {
-                            displayName: 'Global Filter ID',
-                            name: 'globalFilterId',
-                            type: 'number',
-                            default: 0,
-                            description: 'Global filter ID to apply',
-                        },
-                    ],
+                    {
+                        name: 'Delete',
+                        value: 'delete',
+                        action: 'Delete a record',
+                    },
+                ],
+                default: 'get',
+            },
+            {
+                displayName: 'Table Name',
+                name: 'tableName',
+                type: 'string',
+                default: '',
+                placeholder: 'Contacts',
+                description: 'Name of the MinistryPlatform table to interact with',
+            },
+            {
+                displayName: 'Record ID',
+                name: 'recordId',
+                type: 'string',
+                displayOptions: {
+                    show: {
+                        operation: ['get', 'update', 'delete'],
+                    },
                 },
-            ],
-        };
-    }
+                default: '',
+                description: 'ID of the record to retrieve, update, or delete',
+            },
+            {
+                displayName: 'Fields',
+                name: 'fields',
+                placeholder: 'Add Field',
+                type: 'fixedCollection',
+                typeOptions: {
+                    multipleValues: true,
+                },
+                displayOptions: {
+                    show: {
+                        operation: ['create', 'update'],
+                    },
+                },
+                default: {},
+                options: [
+                    {
+                        name: 'field',
+                        displayName: 'Field',
+                        values: [
+                            {
+                                displayName: 'Field Name',
+                                name: 'name',
+                                type: 'string',
+                                default: '',
+                                description: 'Name of the field',
+                            },
+                            {
+                                displayName: 'Field Value',
+                                name: 'value',
+                                type: 'string',
+                                default: '',
+                                description: 'Value of the field',
+                            },
+                        ],
+                    },
+                ],
+            },
+            {
+                displayName: 'Additional Fields',
+                name: 'additionalFields',
+                type: 'collection',
+                placeholder: 'Add Field',
+                default: {},
+                displayOptions: {
+                    show: {
+                        operation: ['list'],
+                    },
+                },
+                options: [
+                    {
+                        displayName: 'Select',
+                        name: 'select',
+                        type: 'string',
+                        default: '',
+                        description: 'Comma-separated list of fields to select',
+                    },
+                    {
+                        displayName: 'Filter',
+                        name: 'filter',
+                        type: 'string',
+                        default: '',
+                        description: 'MS SQL WHERE clause syntax (e.g., "Contact_ID > 1000", "Email_Address=\'user@example.com\'")',
+                    },
+                    {
+                        displayName: 'Order By',
+                        name: 'orderby',
+                        type: 'string',
+                        default: '',
+                        description: 'Field to order results by (e.g., "Display_Name asc")',
+                    },
+                    {
+                        displayName: 'Group By',
+                        name: 'groupby',
+                        type: 'string',
+                        default: '',
+                        description: 'Field to group results by',
+                    },
+                    {
+                        displayName: 'Having',
+                        name: 'having',
+                        type: 'string',
+                        default: '',
+                        description: 'Having clause for grouped results',
+                    },
+                    {
+                        displayName: 'Top',
+                        name: 'top',
+                        type: 'number',
+                        default: 100,
+                        description: 'Maximum number of records to return',
+                    },
+                    {
+                        displayName: 'Skip',
+                        name: 'skip',
+                        type: 'number',
+                        default: 0,
+                        description: 'Number of records to skip for pagination',
+                    },
+                    {
+                        displayName: 'Distinct',
+                        name: 'distinct',
+                        type: 'boolean',
+                        default: false,
+                        description: 'Return only distinct records',
+                    },
+                    {
+                        displayName: 'User ID',
+                        name: 'userId',
+                        type: 'number',
+                        default: 0,
+                        description: 'User ID for context-sensitive queries',
+                    },
+                    {
+                        displayName: 'Global Filter ID',
+                        name: 'globalFilterId',
+                        type: 'number',
+                        default: 0,
+                        description: 'Global filter ID to apply',
+                    },
+                ],
+            },
+        ],
+    };
     async execute() {
         const items = this.getInputData();
         const returnData = [];

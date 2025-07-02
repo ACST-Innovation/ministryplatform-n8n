@@ -37,6 +37,7 @@ export class MinistryPlatformOAuth2Api implements ICredentialType {
 			displayName: 'Access Token URL',
 			name: 'accessTokenUrl',
 			type: 'string',
+			typeOptions: { password: true },
 			default: '',
 			placeholder: 'https://your-instance.ministryplatform.com/ministryplatformapi/oauth/connect/token',
 			description: 'Copy your Environment URL above and add: /ministryplatformapi/oauth/connect/token',

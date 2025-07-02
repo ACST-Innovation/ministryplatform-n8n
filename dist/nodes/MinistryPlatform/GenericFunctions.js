@@ -1,9 +1,9 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ministryPlatformApiRequestAllItems = exports.ministryPlatformApiRequest = void 0;
+exports.ministryPlatformApiRequest = ministryPlatformApiRequest;
+exports.ministryPlatformApiRequestAllItems = ministryPlatformApiRequestAllItems;
 const n8n_workflow_1 = require("n8n-workflow");
 async function ministryPlatformApiRequest(method, resource, body = {}, qs = {}, uri, option = {}, isRetry = false) {
-    var _a, _b, _c, _d, _e;
     const credentials = await this.getCredentials('ministryPlatformOAuth2Api');
     const options = {
         method,
@@ -20,7 +20,7 @@ async function ministryPlatformApiRequest(method, resource, body = {}, qs = {}, 
     }
     catch (error) {
         const errorMessage = error.message || '';
-        const responseData = ((_a = error.response) === null || _a === void 0 ? void 0 : _a.data) || {};
+        const responseData = error.response?.data || {};
         const responseMessage = responseData.Message || responseData.message || '';
         // Check if this is a token expiration error
         const isTokenExpired = errorMessage.includes('token is expired') ||
@@ -28,7 +28,7 @@ async function ministryPlatformApiRequest(method, resource, body = {}, qs = {}, 
             responseMessage.includes('token is expired') ||
             responseMessage.includes('IDX10223');
         // If token is expired and this is not a retry, attempt automatic refresh
-        if (isTokenExpired && !isRetry && ((_b = error.response) === null || _b === void 0 ? void 0 : _b.status) === 500) {
+        if (isTokenExpired && !isRetry && error.response?.status === 500) {
             try {
                 // Try the request one more time - n8n should attempt refresh automatically
                 return await ministryPlatformApiRequest.call(this, method, resource, body, qs, uri, option, true);
@@ -47,13 +47,13 @@ async function ministryPlatformApiRequest(method, resource, body = {}, qs = {}, 
             });
         }
         // Handle other authentication errors
-        if (((_c = error.response) === null || _c === void 0 ? void 0 : _c.status) === 401 || ((_d = error.response) === null || _d === void 0 ? void 0 : _d.status) === 403) {
+        if (error.response?.status === 401 || error.response?.status === 403) {
             throw new n8n_workflow_1.NodeOperationError(this.getNode(), 'Authentication failed. Please check your MinistryPlatform credentials.', {
                 description: 'The request was unauthorized. Verify your OAuth2 credentials are correct and active.'
             });
         }
         // Handle 500 errors with more specific messaging
-        if (((_e = error.response) === null || _e === void 0 ? void 0 : _e.status) === 500) {
+        if (error.response?.status === 500) {
             throw new n8n_workflow_1.NodeOperationError(this.getNode(), `MinistryPlatform server error: ${responseMessage || errorMessage || 'Internal server error'}`, {
                 description: 'The MinistryPlatform server returned an error. Check your request parameters and try again.'
             });
@@ -61,7 +61,6 @@ async function ministryPlatformApiRequest(method, resource, body = {}, qs = {}, 
         throw new n8n_workflow_1.NodeApiError(this.getNode(), error);
     }
 }
-exports.ministryPlatformApiRequest = ministryPlatformApiRequest;
 async function ministryPlatformApiRequestAllItems(method, endpoint, body = {}, query = {}) {
     // If user specified a $top value, respect it and don't paginate
     if (query.$top) {
@@ -91,4 +90,3 @@ async function ministryPlatformApiRequestAllItems(method, endpoint, body = {}, q
         (responseData.value && responseData.value.length === pageSize));
     return returnData;
 }
-exports.ministryPlatformApiRequestAllItems = ministryPlatformApiRequestAllItems;
