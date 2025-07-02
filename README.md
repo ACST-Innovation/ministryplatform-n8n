@@ -1,4 +1,4 @@
-# n8n-nodes-ministryplatform
+# ministryplatform-n8n
 
 This is an n8n community node that lets you use MinistryPlatform in your n8n workflows.
 
