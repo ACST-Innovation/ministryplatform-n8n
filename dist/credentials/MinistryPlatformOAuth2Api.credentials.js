@@ -25,14 +25,18 @@ class MinistryPlatformOAuth2Api {
             {
                 displayName: 'Authorization URL',
                 name: 'authUrl',
-                type: 'hidden',
-                default: '={{$credentials.environmentUrl}}/ministryplatformapi/oauth/connect/authorize',
+                type: 'string',
+                default: '',
+                placeholder: 'https://your-instance.ministryplatform.com/ministryplatformapi/oauth/connect/authorize',
+                description: 'Copy your Environment URL above and add: /ministryplatformapi/oauth/connect/authorize',
             },
             {
                 displayName: 'Access Token URL',
                 name: 'accessTokenUrl',
-                type: 'hidden',
-                default: '={{$credentials.environmentUrl}}/ministryplatformapi/oauth/connect/token',
+                type: 'string',
+                default: '',
+                placeholder: 'https://your-instance.ministryplatform.com/ministryplatformapi/oauth/connect/token',
+                description: 'Copy your Environment URL above and add: /ministryplatformapi/oauth/connect/token',
             },
             {
                 displayName: 'Scope',
