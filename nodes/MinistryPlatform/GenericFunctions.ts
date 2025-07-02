@@ -34,7 +34,7 @@ export async function ministryPlatformApiRequest(
 	try {
 		return await this.helpers.requestOAuth2.call(this, 'ministryPlatformOAuth2Api', options);
 	} catch (error) {
-		throw new NodeApiError(this.getNode(), error);
+		throw new NodeApiError(this.getNode(), error as any);
 	}
 }
 

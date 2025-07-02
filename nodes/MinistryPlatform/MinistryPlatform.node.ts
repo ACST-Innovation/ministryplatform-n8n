@@ -4,6 +4,7 @@ import {
 	INodeType,
 	INodeTypeDescription,
 	NodeOperationError,
+	NodeConnectionType,
 } from 'n8n-workflow';
 
 import { ministryPlatformApiRequest, ministryPlatformApiRequestAllItems } from './GenericFunctions';
@@ -20,8 +21,8 @@ export class MinistryPlatform implements INodeType {
 		defaults: {
 			name: 'MinistryPlatform',
 		},
-		inputs: ['main'],
-		outputs: ['main'],
+		inputs: [NodeConnectionType.Main],
+		outputs: [NodeConnectionType.Main],
 		credentials: [
 			{
 				name: 'ministryPlatformOAuth2Api',
@@ -216,7 +217,7 @@ export class MinistryPlatform implements INodeType {
 				let responseData;
 				const tableName = resource === 'table' 
 					? this.getNodeParameter('tableName', i) as string
-					: this.getResourceTableName(resource);
+					: MinistryPlatform.getResourceTableName(resource);
 
 				if (operation === 'create') {
 					const fields = this.getNodeParameter('fields.field', i, []) as Array<{name: string, value: string}>;
@@ -268,7 +269,7 @@ export class MinistryPlatform implements INodeType {
 			} catch (error) {
 				if (this.continueOnFail()) {
 					const executionData = this.helpers.constructExecutionMetaData(
-						this.helpers.returnJsonArray({ error: error.message }),
+						this.helpers.returnJsonArray({ error: (error as Error).message }),
 						{ itemData: { item: i } },
 					);
 					returnData.push(...executionData);
@@ -281,7 +282,7 @@ export class MinistryPlatform implements INodeType {
 		return [returnData];
 	}
 
-	private getResourceTableName(resource: string): string {
+	static getResourceTableName(resource: string): string {
 		const tableMap: Record<string, string> = {
 			contact: 'Contacts',
 			event: 'Events',
