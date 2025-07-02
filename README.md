@@ -8,7 +8,9 @@ MinistryPlatform is a church management system that provides tools for managing 
 
 ## Installation
 
-### Docker Installation (Recommended)
+### Docker Installation
+
+#### Option 1: Manual Installation 
 
 1. **Clone the repository:**
    ```bash
@@ -50,6 +52,30 @@ MinistryPlatform is a church management system that provides tools for managing 
      -v n8n_data:/home/node/.n8n \
      n8nio/n8n:latest
    ```
+
+#### Option 2: Custom Docker Build (ECR Ready)
+
+Build a custom n8n image with the MinistryPlatform node pre-installed:
+
+1. **Build custom image:**
+   ```bash
+   # Use any custom Dockerfile that includes this setup
+   docker build -t n8n-ministryplatform .
+   ```
+
+2. **Run the custom image:**
+   ```bash
+   docker run -d \
+     --name n8n \
+     -p 5678:5678 \
+     -v n8n_data:/home/node/.n8n \
+     n8n-ministryplatform
+   ```
+
+3. **ECR Deployment:**
+   - Tag and push to ECR: `docker tag n8n-ministryplatform:latest your-ecr-repo:latest`
+   - Deploy anywhere with the node pre-installed
+   - No manual setup required
 
 ### NPM Installation
 
