@@ -135,4 +135,4 @@ Tested with n8n version 1.0+
 ## Resources
 
 * [n8n community nodes documentation](https://docs.n8n.io/integrations/community-nodes/)
-* [MinistryPlatform API Documentation](https://mpi.ministryplatform.com/ministryplatformapi/swagger/ui/index)
+* [MinistryPlatform Developer Resources](https://help.acst.com/en/ministryplatform/developer-resources/developer-resources)
