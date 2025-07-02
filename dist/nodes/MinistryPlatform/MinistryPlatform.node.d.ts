@@ -2,5 +2,4 @@ import { IExecuteFunctions, INodeExecutionData, INodeType, INodeTypeDescription 
 export declare class MinistryPlatform implements INodeType {
     description: INodeTypeDescription;
     execute(this: IExecuteFunctions): Promise<INodeExecutionData[][]>;
-    static getResourceTableName(resource: string): string;
 }
