@@ -16,6 +16,7 @@ export async function ministryPlatformApiRequest(
 	qs: any = {},
 	uri?: string,
 	option: any = {},
+	isRetry: boolean = false,
 ): Promise<any> {
 	const credentials = await this.getCredentials('ministryPlatformOAuth2Api');
 	
@@ -34,15 +35,34 @@ export async function ministryPlatformApiRequest(
 	try {
 		return await this.helpers.requestOAuth2.call(this, 'ministryPlatformOAuth2Api', options);
 	} catch (error: any) {
-		// Handle token expiration - can come as 500 error with IDX10223 message
 		const errorMessage = error.message || '';
 		const responseData = error.response?.data || {};
 		const responseMessage = responseData.Message || responseData.message || '';
 		
-		if (errorMessage.includes('token is expired') || 
+		// Check if this is a token expiration error
+		const isTokenExpired = errorMessage.includes('token is expired') || 
 			errorMessage.includes('IDX10223') || 
 			responseMessage.includes('token is expired') ||
-			responseMessage.includes('IDX10223')) {
+			responseMessage.includes('IDX10223');
+
+		// If token is expired and this is not a retry, attempt automatic refresh
+		if (isTokenExpired && !isRetry && error.response?.status === 500) {
+			try {
+				// Try the request one more time - n8n should attempt refresh automatically
+				return await ministryPlatformApiRequest.call(this, method, resource, body, qs, uri, option, true);
+			} catch (retryError: any) {
+				// If retry fails, provide user-friendly error message
+				throw new NodeOperationError(this.getNode(), 
+					'OAuth2 token has expired. Please reconnect your MinistryPlatform credentials in n8n to refresh the token.', 
+					{ 
+						description: 'The access token has expired. Automatic refresh was attempted but failed. Please reconnect your credentials manually to get a new token.'
+					}
+				);
+			}
+		}
+		
+		// Handle token expiration on retry or other scenarios
+		if (isTokenExpired) {
 			throw new NodeOperationError(this.getNode(), 
 				'OAuth2 token has expired. Please reconnect your MinistryPlatform credentials in n8n to refresh the token.', 
 				{ 

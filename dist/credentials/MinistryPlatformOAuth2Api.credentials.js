@@ -42,7 +42,13 @@ class MinistryPlatformOAuth2Api {
                 displayName: 'Scope',
                 name: 'scope',
                 type: 'hidden',
-                default: 'http://www.thinkministry.com/dataplatform/scopes/all',
+                default: 'http://www.thinkministry.com/dataplatform/scopes/all offline_access',
+            },
+            {
+                displayName: 'Use Refresh Token',
+                name: 'useRefreshToken',
+                type: 'hidden',
+                default: true,
             },
             {
                 displayName: 'Auth URI Query Parameters',

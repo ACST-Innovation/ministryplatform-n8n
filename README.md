@@ -150,6 +150,7 @@ In n8n, create new MinistryPlatform OAuth2 API credentials with:
 3. **Access Token URL**: `https://your-instance.ministryplatform.com/ministryplatformapi/oauth/connect/token`
 4. **Client ID**: From your MinistryPlatform OAuth app
 5. **Client Secret**: From your MinistryPlatform OAuth app
+6. **Scope**: `http://www.thinkministry.com/dataplatform/scopes/all offline_access` (includes offline_access for refresh tokens)
 
 **Note:** Replace `your-instance` with your actual MinistryPlatform subdomain.
 

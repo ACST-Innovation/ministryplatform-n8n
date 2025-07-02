@@ -57,7 +57,7 @@ n8n-mp/
 - **Type**: OAuth2 Authorization Code flow
 - **Auth URL**: `https://mpi.ministryplatform.com/oauth/connect/authorize`
 - **Token URL**: `https://mpi.ministryplatform.com/oauth/connect/token`
-- **Scope**: `http://www.thinkministry.com/dataplatform/scopes/all`
+- **Scope**: `http://www.thinkministry.com/dataplatform/scopes/all offline_access`
 - **Base URL**: `https://mpi.ministryplatform.com/ministryplatformapi`
 
 ### API Documentation

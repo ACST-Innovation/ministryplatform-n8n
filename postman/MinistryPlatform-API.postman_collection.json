@@ -25,7 +25,7 @@
 			},
 			{
 				"key": "scope",
-				"value": "http://www.thinkministry.com/dataplatform/scopes/all",
+				"value": "http://www.thinkministry.com/dataplatform/scopes/all offline_access",
 				"type": "string"
 			},
 			{
