@@ -128,14 +128,6 @@ class MinistryPlatform {
                     },
                     options: [
                         {
-                            displayName: 'Filter',
-                            name: 'filter',
-                            type: 'string',
-                            default: '',
-                            description: 'OData filter expression (e.g., "Contact_ID eq 1")',
-                            noDataExpression: true,
-                        },
-                        {
                             displayName: 'Select',
                             name: 'select',
                             type: 'string',
@@ -144,11 +136,35 @@ class MinistryPlatform {
                             noDataExpression: true,
                         },
                         {
+                            displayName: 'Filter',
+                            name: 'filter',
+                            type: 'string',
+                            default: '',
+                            description: 'OData filter expression (e.g., "Contact_ID eq 1")',
+                            noDataExpression: true,
+                        },
+                        {
                             displayName: 'Order By',
                             name: 'orderby',
                             type: 'string',
                             default: '',
-                            description: 'Field to order results by',
+                            description: 'Field to order results by (e.g., "Display_Name asc")',
+                            noDataExpression: true,
+                        },
+                        {
+                            displayName: 'Group By',
+                            name: 'groupby',
+                            type: 'string',
+                            default: '',
+                            description: 'Field to group results by',
+                            noDataExpression: true,
+                        },
+                        {
+                            displayName: 'Having',
+                            name: 'having',
+                            type: 'string',
+                            default: '',
+                            description: 'Having clause for grouped results',
                             noDataExpression: true,
                         },
                         {
@@ -166,36 +182,25 @@ class MinistryPlatform {
                             description: 'Number of records to skip for pagination',
                         },
                         {
-                            displayName: 'Custom Parameters',
-                            name: 'customParameters',
-                            placeholder: 'Add Parameter',
-                            type: 'fixedCollection',
-                            typeOptions: {
-                                multipleValues: true,
-                            },
-                            default: {},
-                            options: [
-                                {
-                                    name: 'parameter',
-                                    displayName: 'Parameter',
-                                    values: [
-                                        {
-                                            displayName: 'Name',
-                                            name: 'name',
-                                            type: 'string',
-                                            default: '',
-                                            description: 'Parameter name (e.g., $expand, $count)',
-                                        },
-                                        {
-                                            displayName: 'Value',
-                                            name: 'value',
-                                            type: 'string',
-                                            default: '',
-                                            description: 'Parameter value',
-                                        },
-                                    ],
-                                },
-                            ],
+                            displayName: 'Distinct',
+                            name: 'distinct',
+                            type: 'boolean',
+                            default: false,
+                            description: 'Return only distinct records',
+                        },
+                        {
+                            displayName: 'User ID',
+                            name: 'userId',
+                            type: 'number',
+                            default: 0,
+                            description: 'User ID for context-sensitive queries',
+                        },
+                        {
+                            displayName: 'Global Filter ID',
+                            name: 'globalFilterId',
+                            type: 'number',
+                            default: 0,
+                            description: 'Global filter ID to apply',
                         },
                     ],
                 },
@@ -225,25 +230,26 @@ class MinistryPlatform {
                 else if (operation === 'list') {
                     const additionalFields = this.getNodeParameter('additionalFields', i);
                     const qs = {};
-                    if (additionalFields.filter)
-                        qs.$filter = additionalFields.filter;
                     if (additionalFields.select)
                         qs.$select = additionalFields.select;
+                    if (additionalFields.filter)
+                        qs.$filter = additionalFields.filter;
                     if (additionalFields.orderby)
                         qs.$orderby = additionalFields.orderby;
+                    if (additionalFields.groupby)
+                        qs.$groupby = additionalFields.groupby;
+                    if (additionalFields.having)
+                        qs.$having = additionalFields.having;
                     if (additionalFields.top)
                         qs.$top = additionalFields.top;
                     if (additionalFields.skip)
                         qs.$skip = additionalFields.skip;
-                    // Add custom parameters
-                    if (additionalFields.customParameters) {
-                        const customParams = additionalFields.customParameters.parameter || [];
-                        customParams.forEach((param) => {
-                            if (param.name && param.value) {
-                                qs[param.name] = param.value;
-                            }
-                        });
-                    }
+                    if (additionalFields.distinct)
+                        qs.$distinct = additionalFields.distinct;
+                    if (additionalFields.userId)
+                        qs.$userId = additionalFields.userId;
+                    if (additionalFields.globalFilterId)
+                        qs.$globalFilterId = additionalFields.globalFilterId;
                     responseData = await GenericFunctions_1.ministryPlatformApiRequestAllItems.call(this, 'GET', `/tables/${tableName}`, {}, qs);
                 }
                 else if (operation === 'update') {
