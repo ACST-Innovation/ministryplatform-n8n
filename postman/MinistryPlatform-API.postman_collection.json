@@ -1,0 +1,291 @@
+{
+	"info": {
+		"_postman_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+		"name": "MinistryPlatform API",
+		"description": "Collection for MinistryPlatform REST API operations on tables",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"auth": {
+		"type": "oauth2",
+		"oauth2": [
+			{
+				"key": "tokenName",
+				"value": "MinistryPlatform Token",
+				"type": "string"
+			},
+			{
+				"key": "authUrl",
+				"value": "https://mpi.ministryplatform.com/oauth/connect/authorize",
+				"type": "string"
+			},
+			{
+				"key": "accessTokenUrl",
+				"value": "https://mpi.ministryplatform.com/oauth/connect/token",
+				"type": "string"
+			},
+			{
+				"key": "scope",
+				"value": "http://www.thinkministry.com/dataplatform/scopes/all",
+				"type": "string"
+			},
+			{
+				"key": "grant_type",
+				"value": "authorization_code",
+				"type": "string"
+			},
+			{
+				"key": "addTokenTo",
+				"value": "header",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "https://mpi.ministryplatform.com/ministryplatformapi",
+			"type": "string",
+			"description": "Base URL for MinistryPlatform API"
+		},
+		{
+			"key": "table_name",
+			"value": "Contacts",
+			"type": "string",
+			"description": "Table name for API operations (e.g., Contacts, Events, Donations)"
+		},
+		{
+			"key": "record_id",
+			"value": "1",
+			"type": "string",
+			"description": "Record ID for get, update, delete operations"
+		}
+	],
+	"item": [
+		{
+			"name": "Get Record",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/tables/{{table_name}}/{{record_id}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"tables",
+						"{{table_name}}",
+						"{{record_id}}"
+					]
+				},
+				"description": "Get a single record by ID from the specified table"
+			},
+			"response": []
+		},
+		{
+			"name": "List Records",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/tables/{{table_name}}?$top=100&$orderby=Contact_ID",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"tables",
+						"{{table_name}}"
+					],
+					"query": [
+						{
+							"key": "$filter",
+							"value": "Contact_ID gt 0",
+							"description": "OData filter expression",
+							"disabled": true
+						},
+						{
+							"key": "$select",
+							"value": "Contact_ID,Display_Name,Email_Address",
+							"description": "Comma-separated list of fields to select",
+							"disabled": true
+						},
+						{
+							"key": "$orderby",
+							"value": "Contact_ID",
+							"description": "Field to order results by"
+						},
+						{
+							"key": "$top",
+							"value": "100",
+							"description": "Maximum number of records to return"
+						},
+						{
+							"key": "$skip",
+							"value": "0",
+							"description": "Number of records to skip for pagination",
+							"disabled": true
+						},
+						{
+							"key": "$expand",
+							"value": "Household",
+							"description": "Related entities to expand",
+							"disabled": true
+						},
+						{
+							"key": "$count",
+							"value": "true",
+							"description": "Include count of total records",
+							"disabled": true
+						}
+					]
+				},
+				"description": "List records from the specified table with optional OData query parameters"
+			},
+			"response": []
+		},
+		{
+			"name": "List Records with Filter",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/tables/{{table_name}}?$filter=Contact_ID gt 1000&$select=Contact_ID,Display_Name,Email_Address&$orderby=Display_Name&$top=50",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"tables",
+						"{{table_name}}"
+					],
+					"query": [
+						{
+							"key": "$filter",
+							"value": "Contact_ID gt 1000",
+							"description": "OData filter expression"
+						},
+						{
+							"key": "$select",
+							"value": "Contact_ID,Display_Name,Email_Address",
+							"description": "Comma-separated list of fields to select"
+						},
+						{
+							"key": "$orderby",
+							"value": "Display_Name",
+							"description": "Field to order results by"
+						},
+						{
+							"key": "$top",
+							"value": "50",
+							"description": "Maximum number of records to return"
+						}
+					]
+				},
+				"description": "Example of listing records with filter, field selection, and ordering"
+			},
+			"response": []
+		},
+		{
+			"name": "Update Record",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"Display_Name\": \"Updated Name\",\n  \"Email_Address\": \"updated@example.com\",\n  \"Mobile_Phone\": \"555-123-4567\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/tables/{{table_name}}/{{record_id}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"tables",
+						"{{table_name}}",
+						"{{record_id}}"
+					]
+				},
+				"description": "Update a record in the specified table. Include the fields you want to update in the request body."
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Record",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/tables/{{table_name}}/{{record_id}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"tables",
+						"{{table_name}}",
+						"{{record_id}}"
+					]
+				},
+				"description": "Delete a record from the specified table by ID"
+			},
+			"response": []
+		}
+	]
+}
