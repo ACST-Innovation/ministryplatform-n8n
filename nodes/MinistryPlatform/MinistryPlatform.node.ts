@@ -139,7 +139,6 @@ export class MinistryPlatform implements INodeType {
 						type: 'string',
 						default: '',
 						description: 'Comma-separated list of fields to select',
-						noDataExpression: true,
 					},
 					{
 						displayName: 'Filter',
@@ -147,7 +146,6 @@ export class MinistryPlatform implements INodeType {
 						type: 'string',
 						default: '',
 						description: 'MS SQL WHERE clause syntax (e.g., "Contact_ID > 1000", "Email_Address=\'user@example.com\'")',
-						noDataExpression: true,
 					},
 					{
 						displayName: 'Order By',
@@ -155,7 +153,6 @@ export class MinistryPlatform implements INodeType {
 						type: 'string',
 						default: '',
 						description: 'Field to order results by (e.g., "Display_Name asc")',
-						noDataExpression: true,
 					},
 					{
 						displayName: 'Group By',
@@ -163,7 +160,6 @@ export class MinistryPlatform implements INodeType {
 						type: 'string',
 						default: '',
 						description: 'Field to group results by',
-						noDataExpression: true,
 					},
 					{
 						displayName: 'Having',
@@ -171,7 +167,6 @@ export class MinistryPlatform implements INodeType {
 						type: 'string',
 						default: '',
 						description: 'Having clause for grouped results',
-						noDataExpression: true,
 					},
 					{
 						displayName: 'Top',
