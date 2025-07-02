@@ -28,18 +28,14 @@ export class MinistryPlatformOAuth2Api implements ICredentialType {
 		{
 			displayName: 'Authorization URL',
 			name: 'authUrl',
-			type: 'string',
-			default: '',
-			placeholder: 'https://your-instance.ministryplatform.com/ministryplatformapi/oauth/connect/authorize',
-			description: 'Format: [Environment URL]/ministryplatformapi/oauth/connect/authorize',
+			type: 'hidden',
+			default: '={{$credentials.environmentUrl}}/ministryplatformapi/oauth/connect/authorize',
 		},
 		{
 			displayName: 'Access Token URL',
 			name: 'accessTokenUrl',
-			type: 'string',
-			default: '',
-			placeholder: 'https://your-instance.ministryplatform.com/oauth/connect/token',
-			description: 'Format: [Environment URL]/oauth/connect/token (no /ministryplatformapi)',
+			type: 'hidden',
+			default: '={{$credentials.environmentUrl}}/ministryplatformapi/oauth/connect/token',
 		},
 		{
 			displayName: 'Scope',
