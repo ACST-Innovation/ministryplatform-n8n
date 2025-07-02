@@ -18,13 +18,13 @@ class MinistryPlatformOAuth2Api {
                 displayName: 'Authorization URL',
                 name: 'authUrl',
                 type: 'hidden',
-                default: 'https://mpi.ministryplatform.com/oauth/connect/authorize',
+                default: '={{$credentials.environmentUrl}}/oauth/connect/authorize',
             },
             {
                 displayName: 'Access Token URL',
                 name: 'accessTokenUrl',
                 type: 'hidden',
-                default: 'https://mpi.ministryplatform.com/oauth/connect/token',
+                default: '={{$credentials.environmentUrl}}/oauth/connect/token',
             },
             {
                 displayName: 'Scope',
