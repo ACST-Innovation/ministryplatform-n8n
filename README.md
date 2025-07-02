@@ -164,6 +164,8 @@ In n8n, create new MinistryPlatform OAuth2 API credentials with:
 - Verify OAuth URLs include `/ministryplatformapi` path
 - Check redirect URI matches n8n instance URL
 - Ensure MinistryPlatform OAuth app is configured correctly
+- **Token Expired**: If you get token expiration errors, reconnect your credentials in n8n to refresh the token
+- **Automatic Refresh**: n8n should automatically refresh expired tokens, but manual reconnection may be needed
 
 ### Filter Issues
 - Use single quotes for string values: `Email_Address='user@example.com'`

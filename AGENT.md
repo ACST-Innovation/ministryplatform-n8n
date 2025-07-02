@@ -127,6 +127,7 @@ Contact_ID IN (1001, 1002, 1003)
 ## Troubleshooting
 - If build fails, check TypeScript configuration
 - For OAuth2 issues, verify MinistryPlatform app configuration
+- **Token Expiration**: If getting "token is expired" errors, the user needs to reconnect their MinistryPlatform credentials in n8n
 - API errors may indicate authentication or permission issues
 - Use n8n logs for debugging node execution
 

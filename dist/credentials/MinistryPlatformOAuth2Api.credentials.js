@@ -57,6 +57,12 @@ class MinistryPlatformOAuth2Api {
                 default: 'body',
             },
             {
+                displayName: 'Token Request Method',
+                name: 'tokenRequestMethod',
+                type: 'hidden',
+                default: 'POST',
+            },
+            {
                 displayName: 'Client ID',
                 name: 'clientId',
                 type: 'string',

@@ -33,7 +33,44 @@ export async function ministryPlatformApiRequest(
 
 	try {
 		return await this.helpers.requestOAuth2.call(this, 'ministryPlatformOAuth2Api', options);
-	} catch (error) {
+	} catch (error: any) {
+		// Handle token expiration - can come as 500 error with IDX10223 message
+		const errorMessage = error.message || '';
+		const responseData = error.response?.data || {};
+		const responseMessage = responseData.Message || responseData.message || '';
+		
+		if (errorMessage.includes('token is expired') || 
+			errorMessage.includes('IDX10223') || 
+			responseMessage.includes('token is expired') ||
+			responseMessage.includes('IDX10223')) {
+			throw new NodeOperationError(this.getNode(), 
+				'OAuth2 token has expired. Please reconnect your MinistryPlatform credentials in n8n to refresh the token.', 
+				{ 
+					description: 'The access token has expired and needs to be refreshed. Go to your credentials and reconnect to MinistryPlatform.'
+				}
+			);
+		}
+		
+		// Handle other authentication errors
+		if (error.response?.status === 401 || error.response?.status === 403) {
+			throw new NodeOperationError(this.getNode(), 
+				'Authentication failed. Please check your MinistryPlatform credentials.', 
+				{ 
+					description: 'The request was unauthorized. Verify your OAuth2 credentials are correct and active.'
+				}
+			);
+		}
+		
+		// Handle 500 errors with more specific messaging
+		if (error.response?.status === 500) {
+			throw new NodeOperationError(this.getNode(), 
+				`MinistryPlatform server error: ${responseMessage || errorMessage || 'Internal server error'}`, 
+				{ 
+					description: 'The MinistryPlatform server returned an error. Check your request parameters and try again.'
+				}
+			);
+		}
+		
 		throw new NodeApiError(this.getNode(), error as any);
 	}
 }
