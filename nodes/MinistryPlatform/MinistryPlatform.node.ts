@@ -37,6 +37,11 @@ export class MinistryPlatform implements INodeType {
 				noDataExpression: true,
 				options: [
 					{
+						name: 'Create',
+						value: 'create',
+						action: 'Create a record',
+					},
+					{
 						name: 'Get',
 						value: 'get',
 						action: 'Get a record',
@@ -89,7 +94,7 @@ export class MinistryPlatform implements INodeType {
 				},
 				displayOptions: {
 					show: {
-						operation: ['update'],
+						operation: ['create', 'update'],
 					},
 				},
 				default: {},
@@ -134,6 +139,7 @@ export class MinistryPlatform implements INodeType {
 						type: 'string',
 						default: '',
 						description: 'OData filter expression (e.g., "Contact_ID eq 1")',
+						noDataExpression: true,
 					},
 					{
 						displayName: 'Select',
@@ -141,6 +147,7 @@ export class MinistryPlatform implements INodeType {
 						type: 'string',
 						default: '',
 						description: 'Comma-separated list of fields to select',
+						noDataExpression: true,
 					},
 					{
 						displayName: 'Order By',
@@ -148,6 +155,7 @@ export class MinistryPlatform implements INodeType {
 						type: 'string',
 						default: '',
 						description: 'Field to order results by',
+						noDataExpression: true,
 					},
 					{
 						displayName: 'Top',
@@ -211,7 +219,15 @@ export class MinistryPlatform implements INodeType {
 				let responseData;
 				const tableName = this.getNodeParameter('tableName', i) as string;
 
-				if (operation === 'get') {
+				if (operation === 'create') {
+					const fields = this.getNodeParameter('fields.field', i, []) as Array<{name: string, value: string}>;
+					const body: any = {};
+					fields.forEach(field => {
+						body[field.name] = field.value;
+					});
+
+					responseData = await ministryPlatformApiRequest.call(this, 'POST', `/tables/${tableName}`, body);
+				} else if (operation === 'get') {
 					const recordId = this.getNodeParameter('recordId', i) as string;
 					responseData = await ministryPlatformApiRequest.call(this, 'GET', `/tables/${tableName}/${recordId}`);
 				} else if (operation === 'list') {

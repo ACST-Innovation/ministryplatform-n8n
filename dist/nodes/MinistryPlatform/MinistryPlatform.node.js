@@ -31,6 +31,11 @@ class MinistryPlatform {
                     noDataExpression: true,
                     options: [
                         {
+                            name: 'Create',
+                            value: 'create',
+                            action: 'Create a record',
+                        },
+                        {
                             name: 'Get',
                             value: 'get',
                             action: 'Get a record',
@@ -83,7 +88,7 @@ class MinistryPlatform {
                     },
                     displayOptions: {
                         show: {
-                            operation: ['update'],
+                            operation: ['create', 'update'],
                         },
                     },
                     default: {},
@@ -128,6 +133,7 @@ class MinistryPlatform {
                             type: 'string',
                             default: '',
                             description: 'OData filter expression (e.g., "Contact_ID eq 1")',
+                            noDataExpression: true,
                         },
                         {
                             displayName: 'Select',
@@ -135,6 +141,7 @@ class MinistryPlatform {
                             type: 'string',
                             default: '',
                             description: 'Comma-separated list of fields to select',
+                            noDataExpression: true,
                         },
                         {
                             displayName: 'Order By',
@@ -142,6 +149,7 @@ class MinistryPlatform {
                             type: 'string',
                             default: '',
                             description: 'Field to order results by',
+                            noDataExpression: true,
                         },
                         {
                             displayName: 'Top',
@@ -202,7 +210,15 @@ class MinistryPlatform {
             try {
                 let responseData;
                 const tableName = this.getNodeParameter('tableName', i);
-                if (operation === 'get') {
+                if (operation === 'create') {
+                    const fields = this.getNodeParameter('fields.field', i, []);
+                    const body = {};
+                    fields.forEach(field => {
+                        body[field.name] = field.value;
+                    });
+                    responseData = await GenericFunctions_1.ministryPlatformApiRequest.call(this, 'POST', `/tables/${tableName}`, body);
+                }
+                else if (operation === 'get') {
                     const recordId = this.getNodeParameter('recordId', i);
                     responseData = await GenericFunctions_1.ministryPlatformApiRequest.call(this, 'GET', `/tables/${tableName}/${recordId}`);
                 }

@@ -45,15 +45,21 @@ export async function ministryPlatformApiRequestAllItems(
 	body: any = {},
 	query: any = {},
 ): Promise<any> {
-	const returnData: any[] = [];
+	// If user specified a $top value, respect it and don't paginate
+	if (query.$top) {
+		return await ministryPlatformApiRequest.call(this, method, endpoint, body, query);
+	}
 
+	// Otherwise, paginate through all results
+	const returnData: any[] = [];
 	let responseData;
-	query.$top = query.$top || 100;
-	let skip = 0;
+	const pageSize = 100;
+	let skip = query.$skip || 0;
+	const originalSkip = skip;
 
 	do {
-		query.$skip = skip;
-		responseData = await ministryPlatformApiRequest.call(this, method, endpoint, body, query);
+		const paginatedQuery = { ...query, $top: pageSize, $skip: skip };
+		responseData = await ministryPlatformApiRequest.call(this, method, endpoint, body, paginatedQuery);
 		
 		if (Array.isArray(responseData)) {
 			returnData.push.apply(returnData, responseData);
@@ -61,12 +67,13 @@ export async function ministryPlatformApiRequestAllItems(
 			returnData.push.apply(returnData, responseData.value);
 		} else {
 			returnData.push(responseData);
+			break;
 		}
 
-		skip += query.$top;
+		skip += pageSize;
 	} while (
-		responseData.length === query.$top || 
-		(responseData.value && responseData.value.length === query.$top)
+		responseData.length === pageSize || 
+		(responseData.value && responseData.value.length === pageSize)
 	);
 
 	return returnData;
