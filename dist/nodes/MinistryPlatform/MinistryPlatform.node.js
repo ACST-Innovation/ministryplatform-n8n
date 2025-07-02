@@ -153,7 +153,7 @@ class MinistryPlatform {
                         },
                     ],
                 },
-                // Additional options
+                // Additional options for non-contact resources
                 {
                     displayName: 'Additional Fields',
                     name: 'additionalFields',
@@ -163,6 +163,7 @@ class MinistryPlatform {
                     displayOptions: {
                         show: {
                             operation: ['getAll'],
+                            resource: ['event', 'donation', 'table'],
                         },
                     },
                     options: [
@@ -193,6 +194,121 @@ class MinistryPlatform {
                             type: 'number',
                             default: 100,
                             description: 'Maximum number of records to return',
+                        },
+                        {
+                            displayName: 'Custom Parameters',
+                            name: 'customParameters',
+                            placeholder: 'Add Parameter',
+                            type: 'fixedCollection',
+                            typeOptions: {
+                                multipleValues: true,
+                            },
+                            default: {},
+                            options: [
+                                {
+                                    name: 'parameter',
+                                    displayName: 'Parameter',
+                                    values: [
+                                        {
+                                            displayName: 'Name',
+                                            name: 'name',
+                                            type: 'string',
+                                            default: '',
+                                            description: 'Parameter name (e.g., $expand, $count)',
+                                        },
+                                        {
+                                            displayName: 'Value',
+                                            name: 'value',
+                                            type: 'string',
+                                            default: '',
+                                            description: 'Parameter value',
+                                        },
+                                    ],
+                                },
+                            ],
+                        },
+                    ],
+                },
+                // Additional options for contact resource
+                {
+                    displayName: 'Additional Fields',
+                    name: 'additionalFields',
+                    type: 'collection',
+                    placeholder: 'Add Field',
+                    default: {},
+                    displayOptions: {
+                        show: {
+                            operation: ['getAll'],
+                            resource: ['contact'],
+                        },
+                    },
+                    options: [
+                        {
+                            displayName: 'Name',
+                            name: 'name',
+                            type: 'string',
+                            default: '',
+                            description: 'Search by contact name ($name parameter)',
+                        },
+                        {
+                            displayName: 'Logon Name',
+                            name: 'logOnName',
+                            type: 'string',
+                            default: '',
+                            description: 'Search by logon name ($logOnName parameter)',
+                        },
+                        {
+                            displayName: 'Select',
+                            name: 'select',
+                            type: 'string',
+                            default: '',
+                            description: 'Comma-separated list of fields to select',
+                        },
+                        {
+                            displayName: 'Order By',
+                            name: 'orderby',
+                            type: 'string',
+                            default: '',
+                            description: 'Field to order results by',
+                        },
+                        {
+                            displayName: 'Top',
+                            name: 'top',
+                            type: 'number',
+                            default: 100,
+                            description: 'Maximum number of records to return',
+                        },
+                        {
+                            displayName: 'Custom Parameters',
+                            name: 'customParameters',
+                            placeholder: 'Add Parameter',
+                            type: 'fixedCollection',
+                            typeOptions: {
+                                multipleValues: true,
+                            },
+                            default: {},
+                            options: [
+                                {
+                                    name: 'parameter',
+                                    displayName: 'Parameter',
+                                    values: [
+                                        {
+                                            displayName: 'Name',
+                                            name: 'name',
+                                            type: 'string',
+                                            default: '',
+                                            description: 'Parameter name (e.g., $expand, $count)',
+                                        },
+                                        {
+                                            displayName: 'Value',
+                                            name: 'value',
+                                            type: 'string',
+                                            default: '',
+                                            description: 'Parameter value',
+                                        },
+                                    ],
+                                },
+                            ],
                         },
                     ],
                 },
@@ -225,14 +341,34 @@ class MinistryPlatform {
                 else if (operation === 'getAll') {
                     const additionalFields = this.getNodeParameter('additionalFields', i);
                     const qs = {};
-                    if (additionalFields.filter)
-                        qs.$filter = additionalFields.filter;
+                    // Handle contact-specific parameters
+                    if (resource === 'contact') {
+                        if (additionalFields.name)
+                            qs.$name = additionalFields.name;
+                        if (additionalFields.logOnName)
+                            qs.$logOnName = additionalFields.logOnName;
+                    }
+                    else {
+                        // Handle standard filter for other resources
+                        if (additionalFields.filter)
+                            qs.$filter = additionalFields.filter;
+                    }
+                    // Common parameters for all resources
                     if (additionalFields.select)
                         qs.$select = additionalFields.select;
                     if (additionalFields.orderby)
                         qs.$orderby = additionalFields.orderby;
                     if (additionalFields.top)
                         qs.$top = additionalFields.top;
+                    // Add custom parameters
+                    if (additionalFields.customParameters) {
+                        const customParams = additionalFields.customParameters.parameter || [];
+                        customParams.forEach((param) => {
+                            if (param.name && param.value) {
+                                qs[param.name] = param.value;
+                            }
+                        });
+                    }
                     responseData = await GenericFunctions_1.ministryPlatformApiRequestAllItems.call(this, 'GET', `/tables/${tableName}`, {}, qs);
                 }
                 else if (operation === 'update') {
