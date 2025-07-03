@@ -33,7 +33,7 @@ class MinistryPlatformOAuth2Api {
             displayName: 'Access Token URL',
             name: 'accessTokenUrl',
             type: 'string',
-            typeOptions: { password: true },
+            typeOptions: { password: false },
             default: '',
             placeholder: 'https://your-instance.ministryplatform.com/ministryplatformapi/oauth/connect/token',
             description: 'Copy your Environment URL above and add: /ministryplatformapi/oauth/connect/token',
