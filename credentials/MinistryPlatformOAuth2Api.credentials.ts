@@ -3,6 +3,7 @@ import {
 	ICredentialTestRequest,
 	ICredentialType,
 	INodeProperties,
+	IHttpRequestOptions,
 } from 'n8n-workflow';
 
 export class MinistryPlatformOAuth2Api implements ICredentialType {
@@ -97,6 +98,8 @@ export class MinistryPlatformOAuth2Api implements ICredentialType {
 			},
 		},
 	};
+
+
 
 	test: ICredentialTestRequest = {
 		request: {
