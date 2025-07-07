@@ -3,7 +3,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ministryPlatformApiRequest = ministryPlatformApiRequest;
 exports.ministryPlatformApiRequestAllItems = ministryPlatformApiRequestAllItems;
 const n8n_workflow_1 = require("n8n-workflow");
-const n8n_workflow_2 = require("n8n-workflow");
 // In-memory token cache
 const tokenCache = new Map();
 async function getAccessToken() {
@@ -34,22 +33,10 @@ async function getAccessToken() {
         body,
         json: true,
     };
-    // Debug logging
-    n8n_workflow_2.LoggerProxy.info('MinistryPlatform Token Request', {
-        url: tokenUrl,
-        method: options.method,
-        headers: options.headers,
-        body: body,
-    });
     try {
         const response = await this.helpers.request(options);
-        n8n_workflow_2.LoggerProxy.info('MinistryPlatform Token Response', {
-            success: true,
-            hasAccessToken: !!response.access_token,
-            expiresIn: response.expires_in,
-        });
         if (!response.access_token) {
-            throw new n8n_workflow_1.NodeOperationError(this.getNode(), `No access token received from MinistryPlatform. Response received: ${JSON.stringify(response, null, 2)}`);
+            throw new n8n_workflow_1.NodeOperationError(this.getNode(), 'No access token received from MinistryPlatform');
         }
         // Cache the token
         const expiresIn = (response.expires_in || 3600) * 1000; // Convert to milliseconds
@@ -61,17 +48,7 @@ async function getAccessToken() {
         return response.access_token;
     }
     catch (error) {
-        // Create detailed debug info for the error
-        const debugInfo = {
-            url: tokenUrl,
-            method: 'POST',
-            headers: options.headers,
-            body: body,
-            status: error.response?.status,
-            responseData: error.response?.data,
-            originalError: error.message
-        };
-        throw new n8n_workflow_1.NodeOperationError(this.getNode(), `MinistryPlatform Token Request Failed: ${JSON.stringify(debugInfo, null, 2)}`);
+        throw new n8n_workflow_1.NodeApiError(this.getNode(), error);
     }
 }
 async function ministryPlatformApiRequest(method, resource, body = {}, qs = {}) {

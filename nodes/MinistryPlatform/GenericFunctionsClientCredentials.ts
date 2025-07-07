@@ -8,9 +8,6 @@ import {
 	NodeOperationError,
 } from 'n8n-workflow';
 
-import { Buffer } from 'buffer';
-import { LoggerProxy } from 'n8n-workflow';
-
 // In-memory token cache
 const tokenCache = new Map<string, {
 	access_token: string;
@@ -54,26 +51,13 @@ async function getAccessToken(
 		json: true,
 	};
 	
-	// Debug logging
-	LoggerProxy.info('MinistryPlatform Token Request', {
-		url: tokenUrl,
-		method: options.method,
-		headers: options.headers,
-		body: body,
-	});
-	
 	try {
 		const response = await this.helpers.request(options);
-		LoggerProxy.info('MinistryPlatform Token Response', {
-			success: true,
-			hasAccessToken: !!response.access_token,
-			expiresIn: response.expires_in,
-		});
 		
 		if (!response.access_token) {
 			throw new NodeOperationError(
 				this.getNode(),
-				`No access token received from MinistryPlatform. Response received: ${JSON.stringify(response, null, 2)}`,
+				'No access token received from MinistryPlatform',
 			);
 		}
 		
@@ -88,21 +72,7 @@ async function getAccessToken(
 		
 		return response.access_token;
 	} catch (error: any) {
-		// Create detailed debug info for the error
-		const debugInfo = {
-			url: tokenUrl,
-			method: 'POST',
-			headers: options.headers,
-			body: body,
-			status: error.response?.status,
-			responseData: error.response?.data,
-			originalError: error.message
-		};
-		
-		throw new NodeOperationError(
-			this.getNode(),
-			`MinistryPlatform Token Request Failed: ${JSON.stringify(debugInfo, null, 2)}`
-		);
+		throw new NodeApiError(this.getNode(), error);
 	}
 }
 
