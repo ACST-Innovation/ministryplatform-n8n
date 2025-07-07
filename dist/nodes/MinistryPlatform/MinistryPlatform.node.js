@@ -59,6 +59,11 @@ class MinistryPlatform {
                         value: 'refreshAuth',
                         action: 'Refresh OAuth2 authentication token',
                     },
+                    {
+                        name: 'Test Token Endpoint',
+                        value: 'testTokenEndpoint',
+                        action: 'Test the OAuth2 token endpoint URL',
+                    },
                 ],
                 default: 'get',
             },
@@ -305,6 +310,75 @@ class MinistryPlatform {
                                     'Verify grant types include "Authorization Code" and "Refresh Token"',
                                     'Ensure offline_access scope is properly configured in MinistryPlatform'
                                 ]
+                        };
+                    }
+                }
+                else if (operation === 'testTokenEndpoint') {
+                    // Test the token endpoint with a manual refresh token request
+                    try {
+                        const credentials = await this.getCredentials('ministryPlatformOAuth2Api');
+                        const oauthData = credentials.oauthTokenData;
+                        if (!oauthData?.refresh_token) {
+                            responseData = {
+                                success: false,
+                                message: 'No refresh token available to test with',
+                                suggestion: 'Reconnect credentials first to get a refresh token'
+                            };
+                        }
+                        else {
+                            // Test different possible token URLs
+                            const testUrls = [
+                                credentials.accessTokenUrl, // Current configured URL
+                                `${credentials.environmentUrl}/oauth/connect/token`, // Without /ministryplatformapi
+                                `${credentials.environmentUrl}/ministryplatformapi/oauth/connect/token`, // With /ministryplatformapi
+                            ];
+                            const results = [];
+                            for (const tokenUrl of testUrls) {
+                                try {
+                                    const bodyParams = [
+                                        `grant_type=refresh_token`,
+                                        `refresh_token=${encodeURIComponent(oauthData.refresh_token)}`,
+                                        `client_id=${encodeURIComponent(credentials.clientId)}`,
+                                        `client_secret=${encodeURIComponent(credentials.clientSecret)}`,
+                                    ].join('&');
+                                    const response = await this.helpers.httpRequest({
+                                        url: tokenUrl,
+                                        method: 'POST',
+                                        headers: {
+                                            'Content-Type': 'application/x-www-form-urlencoded',
+                                        },
+                                        body: bodyParams,
+                                    });
+                                    results.push({
+                                        url: tokenUrl,
+                                        success: true,
+                                        hasAccessToken: !!response.access_token,
+                                        response: response
+                                    });
+                                }
+                                catch (error) {
+                                    results.push({
+                                        url: tokenUrl,
+                                        success: false,
+                                        error: error.message,
+                                        statusCode: error.response?.status,
+                                        responseBody: error.response?.data
+                                    });
+                                }
+                            }
+                            responseData = {
+                                success: true,
+                                message: 'Token endpoint testing completed',
+                                testResults: results,
+                                recommendation: results.find(r => r.success)?.url || 'No working URL found'
+                            };
+                        }
+                    }
+                    catch (error) {
+                        responseData = {
+                            success: false,
+                            message: 'Token endpoint test failed',
+                            error: error.message,
                         };
                     }
                 }
