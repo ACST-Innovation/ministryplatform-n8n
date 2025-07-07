@@ -7,7 +7,7 @@ import {
 	NodeConnectionType,
 } from 'n8n-workflow';
 
-import { ministryPlatformApiRequest, ministryPlatformApiRequestAllItems } from './GenericFunctions';
+import { ministryPlatformApiRequest, ministryPlatformApiRequestAllItems } from './GenericFunctionsClientCredentials';
 
 export class MinistryPlatform implements INodeType {
 	description: INodeTypeDescription = {
@@ -25,7 +25,7 @@ export class MinistryPlatform implements INodeType {
 		outputs: [NodeConnectionType.Main],
 		credentials: [
 			{
-				name: 'ministryPlatformOAuth2Api',
+				name: 'ministryPlatformApi',
 				required: true,
 			},
 		],
@@ -61,16 +61,7 @@ export class MinistryPlatform implements INodeType {
 						value: 'delete',
 						action: 'Delete a record',
 					},
-					{
-						name: 'Refresh Authentication',
-						value: 'refreshAuth',
-						action: 'Refresh OAuth2 authentication token',
-					},
-					{
-						name: 'Test Token Endpoint',
-						value: 'testTokenEndpoint',
-						action: 'Test the OAuth2 token endpoint URL',
-					},
+
 				],
 				default: 'get',
 			},
@@ -274,138 +265,6 @@ export class MinistryPlatform implements INodeType {
 				} else if (operation === 'delete') {
 					const recordId = this.getNodeParameter('recordId', i) as string;
 					responseData = await ministryPlatformApiRequest.call(this, 'DELETE', `/tables/${tableName}/${recordId}`);
-				} else if (operation === 'refreshAuth') {
-					// Check credential details and try refresh
-					try {
-						const credentialsBefore = await this.getCredentials('ministryPlatformOAuth2Api');
-						const oauthDataBefore = credentialsBefore.oauthTokenData as any;
-						
-						const beforeToken = oauthDataBefore?.access_token?.substring(0, 20) + '...';
-						
-						responseData = {
-							hasRefreshToken: !!(oauthDataBefore?.refresh_token),
-							tokenExpiresAt: oauthDataBefore?.expires_at || 'N/A',
-							currentTime: new Date().toISOString(),
-							scope: credentialsBefore.scope || 'N/A',
-							tokenBefore: beforeToken,
-						};
-
-						// Try the API call - this should trigger refresh if needed
-						const testResponse = await ministryPlatformApiRequest.call(this, 'GET', '/tables');
-						
-						// Check if token was updated after the call
-						const credentialsAfter = await this.getCredentials('ministryPlatformOAuth2Api');
-						const oauthDataAfter = credentialsAfter.oauthTokenData as any;
-						const afterToken = oauthDataAfter?.access_token?.substring(0, 20) + '...';
-						
-						const tokenChanged = beforeToken !== afterToken;
-						
-						responseData = {
-							...responseData,
-							success: true,
-							message: tokenChanged 
-								? 'Token was automatically refreshed and saved'
-								: 'Token is still valid (no refresh needed)',
-							refreshedAt: new Date().toISOString(),
-							tablesCount: Array.isArray(testResponse) ? testResponse.length : 'N/A',
-							tokenAfter: afterToken,
-							tokenWasRefreshed: tokenChanged,
-							credentialsUpdated: tokenChanged ? 'Yes - n8n saved new token' : 'No - same token used',
-						};
-					} catch (error: any) {
-						const hasRefreshToken: boolean = (responseData as any)?.hasRefreshToken || false;
-						responseData = {
-							...responseData,
-							success: false,
-							message: hasRefreshToken 
-								? 'Token refresh failed - refresh token may be expired'
-								: 'No refresh token available - MinistryPlatform did not issue a refresh token',
-							error: error.message,
-							refreshedAt: new Date().toISOString(),
-							suggestion: hasRefreshToken
-								? 'Please reconnect your MinistryPlatform OAuth2 credentials manually - the refresh token may have expired'
-								: 'Please reconnect your credentials AND check your MinistryPlatform OAuth2 app configuration to ensure it issues refresh tokens',
-							nextSteps: hasRefreshToken
-								? ['Reconnect credentials in n8n']
-								: [
-									'Reconnect credentials in n8n',
-									'Check MinistryPlatform OAuth app settings',
-									'Verify grant types include "Authorization Code" and "Refresh Token"',
-									'Ensure offline_access scope is properly configured in MinistryPlatform'
-								]
-						};
-					}
-				} else if (operation === 'testTokenEndpoint') {
-					// Test the token endpoint with a manual refresh token request
-					try {
-						const credentials = await this.getCredentials('ministryPlatformOAuth2Api');
-						const oauthData = credentials.oauthTokenData as any;
-						
-						if (!oauthData?.refresh_token) {
-							responseData = {
-								success: false,
-								message: 'No refresh token available to test with',
-								suggestion: 'Reconnect credentials first to get a refresh token'
-							};
-						} else {
-							// Test different possible token URLs
-							const testUrls = [
-								credentials.accessTokenUrl as string, // Current configured URL
-								`${credentials.environmentUrl}/oauth/connect/token`, // Without /ministryplatformapi
-								`${credentials.environmentUrl}/ministryplatformapi/oauth/connect/token`, // With /ministryplatformapi
-							];
-
-							const results = [];
-							
-							for (const tokenUrl of testUrls) {
-								try {
-									const bodyParams = [
-										`grant_type=refresh_token`,
-										`refresh_token=${encodeURIComponent(oauthData.refresh_token)}`,
-										`client_id=${encodeURIComponent(credentials.clientId as string)}`,
-										`client_secret=${encodeURIComponent(credentials.clientSecret as string)}`,
-									].join('&');
-
-									const response = await this.helpers.httpRequest({
-										url: tokenUrl,
-										method: 'POST',
-										headers: {
-											'Content-Type': 'application/x-www-form-urlencoded',
-										},
-										body: bodyParams,
-									});
-
-									results.push({
-										url: tokenUrl,
-										success: true,
-										hasAccessToken: !!(response as any).access_token,
-										response: response
-									});
-								} catch (error: any) {
-									results.push({
-										url: tokenUrl,
-										success: false,
-										error: error.message,
-										statusCode: error.response?.status,
-										responseBody: error.response?.data
-									});
-								}
-							}
-
-							responseData = {
-								success: true,
-								message: 'Token endpoint testing completed',
-								testResults: results,
-								recommendation: results.find(r => r.success)?.url || 'No working URL found'
-							};
-						}
-					} catch (error: any) {
-						responseData = {
-							success: false,
-							message: 'Token endpoint test failed',
-							error: error.message,
-						};
-					}
 				}
 
 				const executionData = this.helpers.constructExecutionMetaData(
