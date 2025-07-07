@@ -33,7 +33,8 @@
       "dist/credentials/MinistryPlatformOAuth2Api.credentials.js"
     ],
     "nodes": [
-      "dist/nodes/MinistryPlatform/MinistryPlatform.node.js"
+      "dist/nodes/MinistryPlatform/MinistryPlatform.node.js",
+      "dist/nodes/MinistryPlatform/RefreshAuthentication.node.js"
     ]
   },
   "devDependencies": {
