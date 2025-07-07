@@ -72,7 +72,7 @@ async function getAccessToken(
 		if (!response.access_token) {
 			throw new NodeOperationError(
 				this.getNode(),
-				'No access token received from MinistryPlatform',
+				`No access token received from MinistryPlatform. Response received: ${JSON.stringify(response, null, 2)}`,
 			);
 		}
 		

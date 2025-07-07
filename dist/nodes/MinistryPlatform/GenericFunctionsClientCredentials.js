@@ -48,7 +48,7 @@ async function getAccessToken() {
             expiresIn: response.expires_in,
         });
         if (!response.access_token) {
-            throw new n8n_workflow_1.NodeOperationError(this.getNode(), 'No access token received from MinistryPlatform');
+            throw new n8n_workflow_1.NodeOperationError(this.getNode(), `No access token received from MinistryPlatform. Response received: ${JSON.stringify(response, null, 2)}`);
         }
         // Cache the token
         const expiresIn = (response.expires_in || 3600) * 1000; // Convert to milliseconds
