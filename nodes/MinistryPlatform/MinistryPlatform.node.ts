@@ -270,11 +270,23 @@ export class MinistryPlatform implements INodeType {
 					const recordId = this.getNodeParameter('recordId', i) as string;
 					responseData = await ministryPlatformApiRequest.call(this, 'DELETE', `/tables/${tableName}/${recordId}`);
 				} else if (operation === 'refreshAuth') {
-					// Try to make a simple API call - this should trigger automatic refresh if needed
+					// Check credential details and try refresh
 					try {
+						const credentials = await this.getCredentials('ministryPlatformOAuth2Api');
+						const oauthData = credentials.oauthTokenData as any;
+						
+						responseData = {
+							hasRefreshToken: !!(oauthData?.refresh_token),
+							tokenExpiresAt: oauthData?.expires_at || 'N/A',
+							currentTime: new Date().toISOString(),
+							scope: credentials.scope || 'N/A',
+						};
+
+						// Try the API call
 						const testResponse = await ministryPlatformApiRequest.call(this, 'GET', '/tables');
 						
 						responseData = {
+							...responseData,
 							success: true,
 							message: 'Token is still valid or was automatically refreshed',
 							refreshedAt: new Date().toISOString(),
@@ -282,6 +294,7 @@ export class MinistryPlatform implements INodeType {
 						};
 					} catch (error: any) {
 						responseData = {
+							...responseData,
 							success: false,
 							message: 'Token refresh failed or API call failed',
 							error: error.message,

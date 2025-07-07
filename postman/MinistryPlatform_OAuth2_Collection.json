@@ -1,0 +1,242 @@
+{
+	"info": {
+		"name": "MinistryPlatform OAuth2 Testing",
+		"description": "Collection for testing MinistryPlatform OAuth2 authentication flow",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "https://your-instance.ministryplatform.com",
+			"description": "Your MinistryPlatform instance URL"
+		},
+		{
+			"key": "client_id",
+			"value": "",
+			"description": "Your OAuth2 Client ID"
+		},
+		{
+			"key": "client_secret",
+			"value": "",
+			"description": "Your OAuth2 Client Secret"
+		},
+		{
+			"key": "redirect_uri",
+			"value": "https://oauth.pstmn.io/v1/callback",
+			"description": "Postman OAuth2 callback URL"
+		},
+		{
+			"key": "access_token",
+			"value": "",
+			"description": "Access token received from authorization"
+		},
+		{
+			"key": "refresh_token",
+			"value": "",
+			"description": "Refresh token for token renewal"
+		}
+	],
+	"item": [
+		{
+			"name": "1. Get Authorization Code",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/ministryplatformapi/oauth/connect/authorize?response_type=code&client_id={{client_id}}&redirect_uri={{redirect_uri}}&scope=http://www.thinkministry.com/dataplatform/scopes/all offline_access",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"ministryplatformapi",
+						"oauth",
+						"connect",
+						"authorize"
+					],
+					"query": [
+						{
+							"key": "response_type",
+							"value": "code"
+						},
+						{
+							"key": "client_id",
+							"value": "{{client_id}}"
+						},
+						{
+							"key": "redirect_uri",
+							"value": "{{redirect_uri}}"
+						},
+						{
+							"key": "scope",
+							"value": "http://www.thinkministry.com/dataplatform/scopes/all offline_access"
+						}
+					]
+				},
+				"description": "Step 1: Open this URL in browser to get authorization code. You'll be redirected to redirect_uri with the code parameter."
+			}
+		},
+		{
+			"name": "2. Exchange Code for Tokens",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"if (pm.response.code === 200) {",
+							"    const responseJson = pm.response.json();",
+							"    pm.collectionVariables.set('access_token', responseJson.access_token);",
+							"    pm.collectionVariables.set('refresh_token', responseJson.refresh_token);",
+							"    console.log('Tokens saved to collection variables');",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "grant_type",
+							"value": "authorization_code",
+							"type": "text"
+						},
+						{
+							"key": "client_id",
+							"value": "{{client_id}}",
+							"type": "text"
+						},
+						{
+							"key": "client_secret",
+							"value": "{{client_secret}}",
+							"type": "text"
+						},
+						{
+							"key": "code",
+							"value": "",
+							"description": "Paste the authorization code from step 1 here",
+							"type": "text"
+						},
+						{
+							"key": "redirect_uri",
+							"value": "{{redirect_uri}}",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{base_url}}/ministryplatformapi/oauth/connect/token",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"ministryplatformapi",
+						"oauth",
+						"connect",
+						"token"
+					]
+				},
+				"description": "Step 2: Exchange authorization code for access and refresh tokens"
+			}
+		},
+		{
+			"name": "3. Refresh Access Token",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"if (pm.response.code === 200) {",
+							"    const responseJson = pm.response.json();",
+							"    pm.collectionVariables.set('access_token', responseJson.access_token);",
+							"    if (responseJson.refresh_token) {",
+							"        pm.collectionVariables.set('refresh_token', responseJson.refresh_token);",
+							"    }",
+							"    console.log('New access token saved to collection variables');",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "grant_type",
+							"value": "refresh_token",
+							"type": "text"
+						},
+						{
+							"key": "client_id",
+							"value": "{{client_id}}",
+							"type": "text"
+						},
+						{
+							"key": "client_secret",
+							"value": "{{client_secret}}",
+							"type": "text"
+						},
+						{
+							"key": "refresh_token",
+							"value": "{{refresh_token}}",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{base_url}}/ministryplatformapi/oauth/connect/token",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"ministryplatformapi",
+						"oauth",
+						"connect",
+						"token"
+					]
+				},
+				"description": "Use refresh token to get a new access token"
+			}
+		},
+		{
+			"name": "4. Test API Call",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{access_token}}"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/ministryplatformapi/tables",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"ministryplatformapi",
+						"tables"
+					]
+				},
+				"description": "Test the access token by calling the tables endpoint"
+			}
+		}
+	]
+}

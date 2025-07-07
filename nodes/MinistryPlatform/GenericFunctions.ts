@@ -48,14 +48,24 @@ export async function ministryPlatformApiRequest(
 		// If token is expired and this is not a retry, attempt automatic refresh
 		if (isTokenExpired && !isRetry && error.response?.status === 500) {
 			try {
-				// Try the request one more time - n8n should attempt refresh automatically
-				return await ministryPlatformApiRequest.call(this, method, resource, body, qs, uri, option, true);
+				// Try using OAuth2 refresh via a fresh request
+				const freshOptions: IRequestOptions = {
+					...options,
+					headers: {
+						...options.headers,
+						// Remove the old Authorization header to force refresh
+					},
+				};
+				delete freshOptions.headers?.Authorization;
+				
+				// Make a fresh OAuth2 request which should trigger refresh
+				return await this.helpers.requestOAuth2.call(this, 'ministryPlatformOAuth2Api', freshOptions);
 			} catch (retryError: any) {
 				// If retry fails, provide user-friendly error message
 				throw new NodeOperationError(this.getNode(), 
-					'OAuth2 token has expired. Please reconnect your MinistryPlatform credentials in n8n to refresh the token.', 
+					`OAuth2 token has expired and refresh failed: ${retryError.message}. Please reconnect your MinistryPlatform credentials in n8n.`, 
 					{ 
-						description: 'The access token has expired. Automatic refresh was attempted but failed. Please reconnect your credentials manually to get a new token.'
+						description: 'The access token has expired and automatic refresh failed. This may indicate the refresh token has also expired. Please reconnect your credentials manually.'
 					}
 				);
 			}
