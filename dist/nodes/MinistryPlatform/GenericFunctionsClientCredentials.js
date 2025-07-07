@@ -32,6 +32,7 @@ async function getAccessToken() {
             'Content-Type': 'application/x-www-form-urlencoded',
         },
         body,
+        json: true,
     };
     // Debug logging
     n8n_workflow_2.LoggerProxy.info('MinistryPlatform Token Request', {

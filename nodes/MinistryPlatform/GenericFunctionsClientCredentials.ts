@@ -51,6 +51,7 @@ async function getAccessToken(
 			'Content-Type': 'application/x-www-form-urlencoded',
 		},
 		body,
+		json: true,
 	};
 	
 	// Debug logging
