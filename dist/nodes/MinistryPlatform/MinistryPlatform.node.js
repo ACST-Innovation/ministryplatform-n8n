@@ -271,22 +271,34 @@ class MinistryPlatform {
                 else if (operation === 'refreshAuth') {
                     // Check credential details and try refresh
                     try {
-                        const credentials = await this.getCredentials('ministryPlatformOAuth2Api');
-                        const oauthData = credentials.oauthTokenData;
+                        const credentialsBefore = await this.getCredentials('ministryPlatformOAuth2Api');
+                        const oauthDataBefore = credentialsBefore.oauthTokenData;
+                        const beforeToken = oauthDataBefore?.access_token?.substring(0, 20) + '...';
                         responseData = {
-                            hasRefreshToken: !!(oauthData?.refresh_token),
-                            tokenExpiresAt: oauthData?.expires_at || 'N/A',
+                            hasRefreshToken: !!(oauthDataBefore?.refresh_token),
+                            tokenExpiresAt: oauthDataBefore?.expires_at || 'N/A',
                             currentTime: new Date().toISOString(),
-                            scope: credentials.scope || 'N/A',
+                            scope: credentialsBefore.scope || 'N/A',
+                            tokenBefore: beforeToken,
                         };
-                        // Try the API call
+                        // Try the API call - this should trigger refresh if needed
                         const testResponse = await GenericFunctions_1.ministryPlatformApiRequest.call(this, 'GET', '/tables');
+                        // Check if token was updated after the call
+                        const credentialsAfter = await this.getCredentials('ministryPlatformOAuth2Api');
+                        const oauthDataAfter = credentialsAfter.oauthTokenData;
+                        const afterToken = oauthDataAfter?.access_token?.substring(0, 20) + '...';
+                        const tokenChanged = beforeToken !== afterToken;
                         responseData = {
                             ...responseData,
                             success: true,
-                            message: 'Token is still valid or was automatically refreshed',
+                            message: tokenChanged
+                                ? 'Token was automatically refreshed and saved'
+                                : 'Token is still valid (no refresh needed)',
                             refreshedAt: new Date().toISOString(),
                             tablesCount: Array.isArray(testResponse) ? testResponse.length : 'N/A',
+                            tokenAfter: afterToken,
+                            tokenWasRefreshed: tokenChanged,
+                            credentialsUpdated: tokenChanged ? 'Yes - n8n saved new token' : 'No - same token used',
                         };
                     }
                     catch (error) {
