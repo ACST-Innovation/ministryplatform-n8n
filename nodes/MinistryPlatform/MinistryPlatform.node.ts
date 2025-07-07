@@ -293,13 +293,26 @@ export class MinistryPlatform implements INodeType {
 							tablesCount: Array.isArray(testResponse) ? testResponse.length : 'N/A',
 						};
 					} catch (error: any) {
+						const hasRefreshToken: boolean = (responseData as any)?.hasRefreshToken || false;
 						responseData = {
 							...responseData,
 							success: false,
-							message: 'Token refresh failed or API call failed',
+							message: hasRefreshToken 
+								? 'Token refresh failed - refresh token may be expired'
+								: 'No refresh token available - MinistryPlatform did not issue a refresh token',
 							error: error.message,
 							refreshedAt: new Date().toISOString(),
-							suggestion: 'Please reconnect your MinistryPlatform OAuth2 credentials manually',
+							suggestion: hasRefreshToken
+								? 'Please reconnect your MinistryPlatform OAuth2 credentials manually - the refresh token may have expired'
+								: 'Please reconnect your credentials AND check your MinistryPlatform OAuth2 app configuration to ensure it issues refresh tokens',
+							nextSteps: hasRefreshToken
+								? ['Reconnect credentials in n8n']
+								: [
+									'Reconnect credentials in n8n',
+									'Check MinistryPlatform OAuth app settings',
+									'Verify grant types include "Authorization Code" and "Refresh Token"',
+									'Ensure offline_access scope is properly configured in MinistryPlatform'
+								]
 						};
 					}
 				}
