@@ -61,6 +61,11 @@ export class MinistryPlatform implements INodeType {
 						value: 'delete',
 						action: 'Delete a record',
 					},
+					{
+						name: 'Refresh Authentication',
+						value: 'refreshAuth',
+						action: 'Refresh OAuth2 authentication token',
+					},
 				],
 				default: 'get',
 			},
@@ -264,6 +269,26 @@ export class MinistryPlatform implements INodeType {
 				} else if (operation === 'delete') {
 					const recordId = this.getNodeParameter('recordId', i) as string;
 					responseData = await ministryPlatformApiRequest.call(this, 'DELETE', `/tables/${tableName}/${recordId}`);
+				} else if (operation === 'refreshAuth') {
+					// Try to make a simple API call - this should trigger automatic refresh if needed
+					try {
+						const testResponse = await ministryPlatformApiRequest.call(this, 'GET', '/tables');
+						
+						responseData = {
+							success: true,
+							message: 'Token is still valid or was automatically refreshed',
+							refreshedAt: new Date().toISOString(),
+							tablesCount: Array.isArray(testResponse) ? testResponse.length : 'N/A',
+						};
+					} catch (error: any) {
+						responseData = {
+							success: false,
+							message: 'Token refresh failed or API call failed',
+							error: error.message,
+							refreshedAt: new Date().toISOString(),
+							suggestion: 'Please reconnect your MinistryPlatform OAuth2 credentials manually',
+						};
+					}
 				}
 
 				const executionData = this.helpers.constructExecutionMetaData(
