@@ -8,6 +8,8 @@ import {
 	NodeOperationError,
 } from 'n8n-workflow';
 
+import { Buffer } from 'buffer';
+
 // In-memory token cache
 const tokenCache = new Map<string, {
 	access_token: string;
@@ -50,8 +52,21 @@ async function getAccessToken(
 		body,
 	};
 	
+	// Debug logging
+	console.error('MinistryPlatform Token Request:', {
+		url: tokenUrl,
+		method: options.method,
+		headers: options.headers,
+		body: body,
+	});
+	
 	try {
 		const response = await this.helpers.request(options);
+		console.error('MinistryPlatform Token Response:', {
+			success: true,
+			hasAccessToken: !!response.access_token,
+			expiresIn: response.expires_in,
+		});
 		
 		if (!response.access_token) {
 			throw new NodeOperationError(
@@ -71,6 +86,12 @@ async function getAccessToken(
 		
 		return response.access_token;
 	} catch (error: any) {
+		console.error('MinistryPlatform Token Error:', {
+			url: tokenUrl,
+			error: error.message,
+			statusCode: error.response?.status,
+			responseData: error.response?.data,
+		});
 		throw new NodeApiError(this.getNode(), error);
 	}
 }

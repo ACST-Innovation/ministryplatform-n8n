@@ -32,8 +32,20 @@ async function getAccessToken() {
         },
         body,
     };
+    // Debug logging
+    console.error('MinistryPlatform Token Request:', {
+        url: tokenUrl,
+        method: options.method,
+        headers: options.headers,
+        body: body,
+    });
     try {
         const response = await this.helpers.request(options);
+        console.error('MinistryPlatform Token Response:', {
+            success: true,
+            hasAccessToken: !!response.access_token,
+            expiresIn: response.expires_in,
+        });
         if (!response.access_token) {
             throw new n8n_workflow_1.NodeOperationError(this.getNode(), 'No access token received from MinistryPlatform');
         }
@@ -47,6 +59,12 @@ async function getAccessToken() {
         return response.access_token;
     }
     catch (error) {
+        console.error('MinistryPlatform Token Error:', {
+            url: tokenUrl,
+            error: error.message,
+            statusCode: error.response?.status,
+            responseData: error.response?.data,
+        });
         throw new n8n_workflow_1.NodeApiError(this.getNode(), error);
     }
 }
