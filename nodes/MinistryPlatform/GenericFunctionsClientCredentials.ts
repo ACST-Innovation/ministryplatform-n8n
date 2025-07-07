@@ -9,6 +9,7 @@ import {
 } from 'n8n-workflow';
 
 import { Buffer } from 'buffer';
+import { LoggerProxy } from 'n8n-workflow';
 
 // In-memory token cache
 const tokenCache = new Map<string, {
@@ -53,7 +54,7 @@ async function getAccessToken(
 	};
 	
 	// Debug logging
-	console.error('MinistryPlatform Token Request:', {
+	LoggerProxy.info('MinistryPlatform Token Request', {
 		url: tokenUrl,
 		method: options.method,
 		headers: options.headers,
@@ -62,7 +63,7 @@ async function getAccessToken(
 	
 	try {
 		const response = await this.helpers.request(options);
-		console.error('MinistryPlatform Token Response:', {
+		LoggerProxy.info('MinistryPlatform Token Response', {
 			success: true,
 			hasAccessToken: !!response.access_token,
 			expiresIn: response.expires_in,
@@ -86,7 +87,7 @@ async function getAccessToken(
 		
 		return response.access_token;
 	} catch (error: any) {
-		console.error('MinistryPlatform Token Error:', {
+		LoggerProxy.error('MinistryPlatform Token Error', {
 			url: tokenUrl,
 			error: error.message,
 			statusCode: error.response?.status,

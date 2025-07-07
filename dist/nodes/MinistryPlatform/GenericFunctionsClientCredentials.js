@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ministryPlatformApiRequest = ministryPlatformApiRequest;
 exports.ministryPlatformApiRequestAllItems = ministryPlatformApiRequestAllItems;
 const n8n_workflow_1 = require("n8n-workflow");
+const n8n_workflow_2 = require("n8n-workflow");
 // In-memory token cache
 const tokenCache = new Map();
 async function getAccessToken() {
@@ -33,7 +34,7 @@ async function getAccessToken() {
         body,
     };
     // Debug logging
-    console.error('MinistryPlatform Token Request:', {
+    n8n_workflow_2.LoggerProxy.info('MinistryPlatform Token Request', {
         url: tokenUrl,
         method: options.method,
         headers: options.headers,
@@ -41,7 +42,7 @@ async function getAccessToken() {
     });
     try {
         const response = await this.helpers.request(options);
-        console.error('MinistryPlatform Token Response:', {
+        n8n_workflow_2.LoggerProxy.info('MinistryPlatform Token Response', {
             success: true,
             hasAccessToken: !!response.access_token,
             expiresIn: response.expires_in,
@@ -59,7 +60,7 @@ async function getAccessToken() {
         return response.access_token;
     }
     catch (error) {
-        console.error('MinistryPlatform Token Error:', {
+        n8n_workflow_2.LoggerProxy.error('MinistryPlatform Token Error', {
             url: tokenUrl,
             error: error.message,
             statusCode: error.response?.status,
