@@ -5,6 +5,7 @@ import {
 	INodeTypeDescription,
 	NodeOperationError,
 	NodeConnectionType,
+	Icon,
 } from 'n8n-workflow';
 
 import { ministryPlatformApiRequest, ministryPlatformApiRequestAllItems } from './GenericFunctionsClientCredentials';
@@ -13,7 +14,7 @@ export class MinistryPlatform implements INodeType {
 	description: INodeTypeDescription = {
 		displayName: 'MinistryPlatform',
 		name: 'ministryPlatform',
-		icon: 'file:ministryplatform.svg',
+		icon: 'file:ministryplatform.svg' as Icon,
 		group: ['transform'],
 		version: 1,
 		subtitle: '={{$parameter["operation"] + ": " + $parameter["tableName"]}}',
