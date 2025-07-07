@@ -92,7 +92,22 @@ async function getAccessToken(
 			statusCode: error.response?.status,
 			responseData: error.response?.data,
 		});
-		throw new NodeApiError(this.getNode(), error);
+		
+		// Add debug info to error message
+		const debugInfo = `
+Debug Info:
+- URL: ${tokenUrl}
+- Method: POST
+- Headers: ${JSON.stringify(options.headers)}
+- Body: ${body}
+- Status: ${error.response?.status}
+- Response: ${JSON.stringify(error.response?.data)}
+		`;
+		
+		throw new NodeApiError(this.getNode(), {
+			...error,
+			message: `${error.message}\n${debugInfo}`
+		});
 	}
 }
 

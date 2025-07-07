@@ -65,7 +65,20 @@ async function getAccessToken() {
             statusCode: error.response?.status,
             responseData: error.response?.data,
         });
-        throw new n8n_workflow_1.NodeApiError(this.getNode(), error);
+        // Add debug info to error message
+        const debugInfo = `
+Debug Info:
+- URL: ${tokenUrl}
+- Method: POST
+- Headers: ${JSON.stringify(options.headers)}
+- Body: ${body}
+- Status: ${error.response?.status}
+- Response: ${JSON.stringify(error.response?.data)}
+		`;
+        throw new n8n_workflow_1.NodeApiError(this.getNode(), {
+            ...error,
+            message: `${error.message}\n${debugInfo}`
+        });
     }
 }
 async function ministryPlatformApiRequest(method, resource, body = {}, qs = {}) {
