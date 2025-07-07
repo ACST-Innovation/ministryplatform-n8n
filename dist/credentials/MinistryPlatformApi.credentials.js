@@ -48,6 +48,92 @@ class MinistryPlatformApi {
             baseURL: '={{$credentials.baseUrl}}/ministryplatformapi',
             url: '/tables',
         },
+        async test(credentials) {
+            const baseUrl = credentials.baseUrl;
+            const clientId = credentials.clientId;
+            const clientSecret = credentials.clientSecret;
+            const scope = credentials.scope;
+            // Test token request
+            const tokenUrl = `${baseUrl}/ministryplatformapi/oauth/connect/token`;
+            const tokenBody = [
+                `client_id=${encodeURIComponent(clientId)}`,
+                `client_secret=${encodeURIComponent(clientSecret)}`,
+                `grant_type=client_credentials`,
+                `scope=${encodeURIComponent(scope)}`,
+            ].join('&');
+            const tokenOptions = {
+                method: 'POST',
+                url: tokenUrl,
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: tokenBody,
+            };
+            // Log the token request
+            this.logger.info('MP Token Request', {
+                url: tokenUrl,
+                method: 'POST',
+                headers: tokenOptions.headers,
+                body: tokenBody,
+            });
+            try {
+                const tokenResponse = await this.helpers.request(tokenOptions);
+                // Log the token response
+                this.logger.info('MP Token Response', {
+                    success: true,
+                    hasAccessToken: !!tokenResponse.access_token,
+                    expiresIn: tokenResponse.expires_in,
+                    tokenType: tokenResponse.token_type,
+                });
+                if (!tokenResponse.access_token) {
+                    return {
+                        status: 'Error',
+                        message: 'No access token received',
+                    };
+                }
+                // Test API request with token
+                const apiUrl = `${baseUrl}/ministryplatformapi/tables`;
+                const apiOptions = {
+                    method: 'GET',
+                    url: apiUrl,
+                    headers: {
+                        'Authorization': `Bearer ${tokenResponse.access_token}`,
+                        'Content-Type': 'application/json',
+                    },
+                };
+                // Log the API request
+                this.logger.info('MP API Request', {
+                    url: apiUrl,
+                    method: 'GET',
+                    headers: apiOptions.headers,
+                });
+                const apiResponse = await this.helpers.request(apiOptions);
+                // Log the API response
+                this.logger.info('MP API Response', {
+                    success: true,
+                    responseType: typeof apiResponse,
+                    isArray: Array.isArray(apiResponse),
+                    length: Array.isArray(apiResponse) ? apiResponse.length : 'not array',
+                });
+                return {
+                    status: 'OK',
+                    message: 'Authentication successful',
+                };
+            }
+            catch (error) {
+                // Log the error
+                this.logger.error('MP Test Error', {
+                    url: tokenUrl,
+                    error: error.message,
+                    statusCode: error.response?.status,
+                    responseData: error.response?.data,
+                });
+                return {
+                    status: 'Error',
+                    message: `Authentication failed: ${error.message}`,
+                };
+            }
+        }
     };
 }
 exports.MinistryPlatformApi = MinistryPlatformApi;
