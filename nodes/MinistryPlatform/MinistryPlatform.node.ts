@@ -14,7 +14,7 @@ export class MinistryPlatform implements INodeType {
 	description: INodeTypeDescription = {
 		displayName: 'MinistryPlatform',
 		name: 'ministryPlatform',
-		icon: 'file:ministryplatform.svg' as Icon,
+		icon: 'file:ministryplatform.svg',
 		group: ['transform'],
 		version: 1,
 		subtitle: '={{$parameter["operation"] + ": " + $parameter["tableName"]}}',
