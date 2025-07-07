@@ -69,26 +69,16 @@ class MinistryPlatformApi {
                 },
                 body: tokenBody,
             };
-            // Log the token request
-            this.logger.info('MP Token Request', {
-                url: tokenUrl,
-                method: 'POST',
-                headers: tokenOptions.headers,
-                body: tokenBody,
-            });
             try {
                 const tokenResponse = await this.helpers.request(tokenOptions);
-                // Log the token response
-                this.logger.info('MP Token Response', {
-                    success: true,
-                    hasAccessToken: !!tokenResponse.access_token,
-                    expiresIn: tokenResponse.expires_in,
-                    tokenType: tokenResponse.token_type,
-                });
                 if (!tokenResponse.access_token) {
                     return {
                         status: 'Error',
-                        message: 'No access token received',
+                        message: `No access token received. Request: ${JSON.stringify({
+                            url: tokenUrl,
+                            headers: tokenOptions.headers,
+                            body: tokenBody,
+                        }, null, 2)}`,
                     };
                 }
                 // Test API request with token
@@ -101,36 +91,30 @@ class MinistryPlatformApi {
                         'Content-Type': 'application/json',
                     },
                 };
-                // Log the API request
-                this.logger.info('MP API Request', {
-                    url: apiUrl,
-                    method: 'GET',
-                    headers: apiOptions.headers,
-                });
-                const apiResponse = await this.helpers.request(apiOptions);
-                // Log the API response
-                this.logger.info('MP API Response', {
-                    success: true,
-                    responseType: typeof apiResponse,
-                    isArray: Array.isArray(apiResponse),
-                    length: Array.isArray(apiResponse) ? apiResponse.length : 'not array',
-                });
+                await this.helpers.request(apiOptions);
                 return {
                     status: 'OK',
                     message: 'Authentication successful',
                 };
             }
             catch (error) {
-                // Log the error
-                this.logger.error('MP Test Error', {
-                    url: tokenUrl,
-                    error: error.message,
-                    statusCode: error.response?.status,
-                    responseData: error.response?.data,
-                });
+                const debugInfo = {
+                    tokenRequest: {
+                        url: tokenUrl,
+                        method: 'POST',
+                        headers: tokenOptions.headers,
+                        body: tokenBody,
+                    },
+                    error: {
+                        message: error.message,
+                        statusCode: error.response?.status,
+                        responseData: error.response?.data,
+                        responseHeaders: error.response?.headers,
+                    }
+                };
                 return {
                     status: 'Error',
-                    message: `Authentication failed: ${error.message}`,
+                    message: `Authentication failed: ${error.message}\n\nDEBUG INFO:\n${JSON.stringify(debugInfo, null, 2)}`,
                 };
             }
         }
