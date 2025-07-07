@@ -60,26 +60,17 @@ async function getAccessToken() {
         return response.access_token;
     }
     catch (error) {
-        n8n_workflow_2.LoggerProxy.error('MinistryPlatform Token Error', {
+        // Create detailed debug info for the error
+        const debugInfo = {
             url: tokenUrl,
-            error: error.message,
-            statusCode: error.response?.status,
+            method: 'POST',
+            headers: options.headers,
+            body: body,
+            status: error.response?.status,
             responseData: error.response?.data,
-        });
-        // Add debug info to error message
-        const debugInfo = `
-Debug Info:
-- URL: ${tokenUrl}
-- Method: POST
-- Headers: ${JSON.stringify(options.headers)}
-- Body: ${body}
-- Status: ${error.response?.status}
-- Response: ${JSON.stringify(error.response?.data)}
-		`;
-        throw new n8n_workflow_1.NodeApiError(this.getNode(), {
-            ...error,
-            message: `${error.message}\n${debugInfo}`
-        });
+            originalError: error.message
+        };
+        throw new n8n_workflow_1.NodeOperationError(this.getNode(), `MinistryPlatform Token Request Failed: ${JSON.stringify(debugInfo, null, 2)}`);
     }
 }
 async function ministryPlatformApiRequest(method, resource, body = {}, qs = {}) {
