@@ -48,60 +48,6 @@ class MinistryPlatformApi {
             baseURL: '={{$credentials.baseUrl}}/ministryplatformapi',
             url: '/tables',
         },
-        async test(credentials) {
-            const baseUrl = credentials.baseUrl;
-            const clientId = credentials.clientId;
-            const clientSecret = credentials.clientSecret;
-            const scope = credentials.scope;
-            // Test token request
-            const tokenUrl = `${baseUrl}/ministryplatformapi/oauth/connect/token`;
-            const tokenBody = [
-                `client_id=${encodeURIComponent(clientId)}`,
-                `client_secret=${encodeURIComponent(clientSecret)}`,
-                `grant_type=client_credentials`,
-                `scope=${encodeURIComponent(scope)}`,
-            ].join('&');
-            const tokenOptions = {
-                method: 'POST',
-                url: tokenUrl,
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: tokenBody,
-            };
-            try {
-                const tokenResponseRaw = await this.helpers.request(tokenOptions);
-                const tokenResponse = typeof tokenResponseRaw === 'string' ? JSON.parse(tokenResponseRaw) : tokenResponseRaw;
-                if (!tokenResponse.access_token) {
-                    return {
-                        status: 'Error',
-                        message: 'No access token received',
-                    };
-                }
-                // Test API request with token
-                const apiUrl = `${baseUrl}/ministryplatformapi/tables`;
-                const apiOptions = {
-                    method: 'GET',
-                    url: apiUrl,
-                    headers: {
-                        'Authorization': `Bearer ${tokenResponse.access_token}`,
-                        'Content-Type': 'application/json',
-                    },
-                    json: true,
-                };
-                await this.helpers.request(apiOptions);
-                return {
-                    status: 'OK',
-                    message: 'Authentication successful',
-                };
-            }
-            catch (error) {
-                return {
-                    status: 'Error',
-                    message: `Authentication failed: ${error.message}`,
-                };
-            }
-        }
     };
 }
 exports.MinistryPlatformApi = MinistryPlatformApi;
