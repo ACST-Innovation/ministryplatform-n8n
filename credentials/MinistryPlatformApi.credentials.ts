@@ -55,7 +55,8 @@ export class MinistryPlatformApi implements ICredentialType {
 
 	test = {
 	request: {
-			url: '',
+	baseURL: '={{$credentials.baseUrl}}/ministryplatformapi',
+	 url: '/tables',
 		},
 		async test(
 			this: ICredentialTestFunctions,

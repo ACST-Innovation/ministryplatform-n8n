@@ -8,6 +8,7 @@ export declare class MinistryPlatformApi implements ICredentialType {
     authenticate: IAuthenticateGeneric;
     test: {
         request: {
+            baseURL: string;
             url: string;
         };
         test(this: ICredentialTestFunctions, credentials: any): Promise<INodeCredentialTestResult>;

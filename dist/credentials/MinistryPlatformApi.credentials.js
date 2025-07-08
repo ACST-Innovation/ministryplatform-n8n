@@ -45,7 +45,8 @@ class MinistryPlatformApi {
     };
     test = {
         request: {
-            url: '',
+            baseURL: '={{$credentials.baseUrl}}/ministryplatformapi',
+            url: '/tables',
         },
         async test(credentials) {
             const baseUrl = credentials.baseUrl;
