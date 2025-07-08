@@ -68,10 +68,10 @@ class MinistryPlatformApi {
                     'Content-Type': 'application/x-www-form-urlencoded',
                 },
                 body: tokenBody,
-                json: true,
             };
             try {
-                const tokenResponse = await this.helpers.request(tokenOptions);
+                const tokenResponseRaw = await this.helpers.request(tokenOptions);
+                const tokenResponse = typeof tokenResponseRaw === 'string' ? JSON.parse(tokenResponseRaw) : tokenResponseRaw;
                 if (!tokenResponse.access_token) {
                     return {
                         status: 'Error',
