@@ -1,4 +1,4 @@
-import { IAuthenticateGeneric, ICredentialTestRequest, ICredentialType, INodeProperties, Icon } from 'n8n-workflow';
+import { IAuthenticateGeneric, ICredentialType, INodeProperties, Icon, ICredentialTestFunctions, INodeCredentialTestResult } from 'n8n-workflow';
 export declare class MinistryPlatformApi implements ICredentialType {
     name: string;
     displayName: string;
@@ -6,5 +6,11 @@ export declare class MinistryPlatformApi implements ICredentialType {
     icon: Icon;
     properties: INodeProperties[];
     authenticate: IAuthenticateGeneric;
-    test: ICredentialTestRequest;
+    test: {
+        request: {
+            baseURL: string;
+            url: string;
+        };
+        test(this: ICredentialTestFunctions, credentials: any): Promise<INodeCredentialTestResult>;
+    };
 }

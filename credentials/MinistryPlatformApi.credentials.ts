@@ -53,10 +53,74 @@ export class MinistryPlatformApi implements ICredentialType {
 		properties: {},
 	};
 
-	test: ICredentialTestRequest = {
-	 request: {
-	  baseURL: '={{$credentials.baseUrl}}/ministryplatformapi',
-	 url: '/tables',
+	test = {
+	request: {
+	baseURL: '={{$credentials.baseUrl}}/ministryplatformapi',
+	url: '/tables',
 	},
+	 async test(
+			this: ICredentialTestFunctions,
+			credentials: any,
+		): Promise<INodeCredentialTestResult> {
+			const baseUrl = credentials.baseUrl as string;
+			const clientId = credentials.clientId as string;
+			const clientSecret = credentials.clientSecret as string;
+			const scope = credentials.scope as string;
+			
+			// Test token request
+			const tokenUrl = `${baseUrl}/ministryplatformapi/oauth/connect/token`;
+			const tokenBody = [
+				`client_id=${encodeURIComponent(clientId)}`,
+				`client_secret=${encodeURIComponent(clientSecret)}`,
+				`grant_type=client_credentials`,
+				`scope=${encodeURIComponent(scope)}`,
+			].join('&');
+			
+			const tokenOptions: IRequestOptions = {
+				method: 'POST',
+				url: tokenUrl,
+				headers: {
+					'Content-Type': 'application/x-www-form-urlencoded',
+				},
+				body: tokenBody,
+				json: true,
+			};
+			
+			try {
+				const tokenResponse = await this.helpers.request(tokenOptions);
+				
+				if (!tokenResponse.access_token) {
+					return {
+						status: 'Error',
+						message: 'No access token received',
+					};
+				}
+				
+				// Test API request with token
+				const apiUrl = `${baseUrl}/ministryplatformapi/tables`;
+				const apiOptions: IRequestOptions = {
+					method: 'GET',
+					url: apiUrl,
+					headers: {
+						'Authorization': `Bearer ${tokenResponse.access_token}`,
+						'Content-Type': 'application/json',
+					},
+					json: true,
+				};
+				
+				await this.helpers.request(apiOptions);
+				
+				return {
+					status: 'OK',
+					message: 'Authentication successful',
+				};
+				
+			} catch (error: any) {
+				return {
+					status: 'Error',
+					message: `Authentication failed: ${error.message}`,
+				};
+			}
+		}
 	};
 }
