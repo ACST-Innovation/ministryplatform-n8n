@@ -3,7 +3,6 @@ import {
 	INodeExecutionData,
 	INodeType,
 	INodeTypeDescription,
-	NodeConnectionType,
 } from 'n8n-workflow';
 
 import { ministryPlatformApiRequest, ministryPlatformApiRequestAllItems } from './GenericFunctionsClientCredentials';
@@ -20,8 +19,8 @@ export class MinistryPlatform implements INodeType {
 		defaults: {
 			name: 'MinistryPlatform',
 		},
-		inputs: [NodeConnectionType.Main],
-		outputs: [NodeConnectionType.Main],
+		inputs: ['main'] as any,
+		outputs: ['main'] as any,
 		credentials: [
 			{
 				name: 'ministryPlatformApi',

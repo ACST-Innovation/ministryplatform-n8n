@@ -14,8 +14,8 @@ class MinistryPlatform {
         defaults: {
             name: 'MinistryPlatform',
         },
-        inputs: ["main" /* NodeConnectionType.Main */],
-        outputs: ["main" /* NodeConnectionType.Main */],
+        inputs: ['main'],
+        outputs: ['main'],
         credentials: [
             {
                 name: 'ministryPlatformApi',

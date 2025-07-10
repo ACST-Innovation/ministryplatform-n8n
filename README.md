@@ -204,9 +204,6 @@ In n8n, create new MinistryPlatform API credentials with:
 - Check that the scope `http://www.thinkministry.com/dataplatform/scopes/all` is properly configured
 - **Token Management**: Tokens are automatically managed and refreshed by the node
 
-### Known Issues
-- **Credential Test Shows "Unauthorized"**: There is a known issue where the credential test may show as "unauthorized" even though the credentials are valid and will work properly in workflows. If you're confident your Client ID, Client Secret, and Base URL are correct, you can safely ignore this warning and proceed to use the node in your workflows.
-
 ### Filter Issues
 - Use single quotes for string values: `Email_Address='user@example.com'`
 - Use standard SQL operators: `=`, `!=`, `>`, `<`, `>=`, `<=`
@@ -299,6 +296,7 @@ Configure the MinistryPlatform node with:
 - Improved examples with step-by-step configuration
 - Enhanced error handling and token management
 - Updated branding and contact information
+- Fixed credential test authorization issue
 
 ### Version 1.0.0
 - Initial release

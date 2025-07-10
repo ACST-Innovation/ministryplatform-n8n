@@ -29,6 +29,7 @@
 - [x] All CRUD operations supported ✓
 - [x] MS SQL filtering syntax ✓
 - [x] Pagination support ✓
+- [x] Credential test authorization working ✓
 
 ## 🚀 Ready to Publish
 
