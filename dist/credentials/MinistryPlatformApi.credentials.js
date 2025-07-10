@@ -37,11 +37,39 @@ class MinistryPlatformApi {
             default: 'http://www.thinkministry.com/dataplatform/scopes/all',
             description: 'OAuth2 scope for API access',
         },
+        {
+            displayName: 'Access Token',
+            name: 'accessToken',
+            type: 'hidden',
+            default: '',
+            typeOptions: {
+                expirable: true,
+            },
+        },
     ];
-    // This will be handled dynamically in GenericFunctions
+    async preAuthentication(credentials) {
+        const tokenResponse = await this.helpers.httpRequest({
+            method: 'POST',
+            url: `${credentials.baseUrl}/ministryplatformapi/oauth/connect/token`,
+            body: {
+                grant_type: 'client_credentials',
+                client_id: credentials.clientId,
+                client_secret: credentials.clientSecret,
+                scope: credentials.scope,
+            },
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+        });
+        return { accessToken: tokenResponse.access_token };
+    }
     authenticate = {
         type: 'generic',
-        properties: {},
+        properties: {
+            headers: {
+                'Authorization': '=Bearer {{$credentials.accessToken}}',
+            },
+        },
     };
     test = {
         request: {
