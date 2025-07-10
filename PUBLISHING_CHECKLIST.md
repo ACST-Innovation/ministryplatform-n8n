@@ -66,12 +66,12 @@ If you want to be listed in the verified community nodes:
 - **Version**: 1.0.1
 - **Repository**: https://github.com/ACST-Innovation/ministryplatform-n8n
 - **License**: MIT
-- **Author**: ACST Innovation
+- **Author**: Kingdom Creations
 
 ## 🎯 Features Included
 
 - Full CRUD operations (Create, Read, Update, Delete)
-- OAuth2 authentication with automatic token refresh
+- OAuth2 Client Credentials authentication with automatic token management
 - MS SQL syntax filtering for complex queries
 - Pagination support for large datasets
 - All MinistryPlatform tables supported
