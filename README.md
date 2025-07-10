@@ -1,12 +1,30 @@
-# ministryplatform-n8n
+# n8n-nodes-ministryplatform
+
+![n8n](https://img.shields.io/badge/n8n-Community%20Node-blue)
+![npm](https://img.shields.io/npm/v/n8n-nodes-ministryplatform)
+![license](https://img.shields.io/npm/l/n8n-nodes-ministryplatform)
 
 This is an n8n community node that lets you use MinistryPlatform in your n8n workflows.
 
-MinistryPlatform is a church management system that provides tools for managing contacts, events, donations, and more.
+[MinistryPlatform](https://ministryplatform.com/) is a comprehensive church management system that provides tools for managing contacts, events, donations, groups, and more. This integration allows you to automate workflows between MinistryPlatform and other systems.
 
 [n8n](https://n8n.io/) is a [fair-code licensed](https://docs.n8n.io/reference/license/) workflow automation platform.
 
+## Features
+
+- **Full CRUD Operations**: Create, Read, Update, and Delete records in any MinistryPlatform table
+- **OAuth2 Authentication**: Secure authentication with automatic token refresh
+- **Advanced Filtering**: Use MS SQL syntax for complex queries
+- **Pagination Support**: Handle large datasets efficiently
+- **All Tables Supported**: Works with any table in your MinistryPlatform instance
+
 ## Installation
+
+### Community Nodes (Recommended)
+
+Follow the [installation guide](https://docs.n8n.io/integrations/community-nodes/installation/) for your n8n setup to install `n8n-nodes-ministryplatform`.
+
+### Manual Installation
 
 ### Docker Installation
 
@@ -79,18 +97,13 @@ Build a custom n8n image with the MinistryPlatform node pre-installed:
 
 ### NPM Installation
 
-Alternatively, install as a global npm package:
+For self-hosted n8n instances, you can install directly via npm:
 
 ```bash
-# Clone and build
-git clone https://github.com/ACST-Innovation/ministryplatform-n8n.git
-cd ministryplatform-n8n
-npm install
-npm run build
-
-# Install globally
-npm install -g .
+npm install n8n-nodes-ministryplatform
 ```
+
+Then restart your n8n instance to load the new node.
 
 ## Operations
 
@@ -232,6 +245,57 @@ A Postman collection is included in the `postman/` directory for testing the Min
 - **Documentation**: `postman/README.md`
 
 The collection includes examples for all operations (Create, Get, List, Update, Delete) with proper OAuth2 configuration.
+
+## Examples
+
+### Get Contact Information
+```javascript
+// List all contacts with Gmail addresses
+{
+  "operation": "list",
+  "tableName": "Contacts",
+  "select": "Contact_ID,Display_Name,Email_Address,Mobile_Phone",
+  "filter": "Email_Address LIKE '%gmail.com%'",
+  "orderby": "Display_Name ASC"
+}
+```
+
+### Create Event Registration
+```javascript
+// Create a new event participant
+{
+  "operation": "create",
+  "tableName": "Event_Participants",
+  "data": {
+    "Event_ID": 123,
+    "Contact_ID": 456,
+    "Participation_Status_ID": 1
+  }
+}
+```
+
+## Changelog
+
+### Version 1.0.0
+- Initial release
+- Full CRUD operations for all MinistryPlatform tables
+- OAuth2 authentication with refresh token support
+- MS SQL syntax filtering
+- Pagination support
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## Support
+
+For issues and questions:
+- GitHub Issues: [Report a bug or request a feature](https://github.com/ACST-Innovation/ministryplatform-n8n/issues)
+- n8n Community: [Get help from the community](https://community.n8n.io/)
+
+## License
+
+MIT - see [LICENSE](LICENSE) file for details.
 
 ## Resources
 

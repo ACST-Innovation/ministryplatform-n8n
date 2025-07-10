@@ -4,9 +4,6 @@ import {
 	ICredentialType,
 	INodeProperties,
 	Icon,
-	ICredentialTestFunctions,
-	IRequestOptions,
-	INodeCredentialTestResult,
 } from 'n8n-workflow';
 
 export class MinistryPlatformApi implements ICredentialType {
@@ -54,9 +51,9 @@ export class MinistryPlatformApi implements ICredentialType {
 	};
 
 	test: ICredentialTestRequest = {
-	request: {
-	 baseURL: '={{$credentials.baseUrl}}/ministryplatformapi',
-	  url: '/tables',
-	},
+		request: {
+			baseURL: '={{$credentials.baseUrl}}/ministryplatformapi',
+			url: '/tables',
+		},
 	};
 }

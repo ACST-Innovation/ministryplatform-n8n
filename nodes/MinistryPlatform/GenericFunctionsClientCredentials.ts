@@ -143,9 +143,9 @@ export async function ministryPlatformApiRequestAllItems(
 		responseData = await ministryPlatformApiRequest.call(this, method, endpoint, body, query);
 		
 		if (Array.isArray(responseData)) {
-			returnData.push.apply(returnData, responseData);
+			returnData.push(...responseData);
 		} else if (responseData.value && Array.isArray(responseData.value)) {
-			returnData.push.apply(returnData, responseData.value);
+			returnData.push(...responseData.value);
 		} else {
 			returnData.push(responseData);
 		}

@@ -1,19 +1,27 @@
 {
   "name": "n8n-nodes-ministryplatform",
-  "version": "1.0.0",
-  "description": "n8n community node for MinistryPlatform integration",
+  "version": "1.0.1",
+  "description": "n8n community node for MinistryPlatform - a powerful church management system integration supporting OAuth2 authentication and full CRUD operations on all MinistryPlatform tables",
   "keywords": [
-    "n8n-community-node-package"
+    "n8n-community-node-package",
+    "n8n",
+    "n8n-node",
+    "ministryplatform",
+    "church",
+    "crm",
+    "api",
+    "oauth2",
+    "automation"
   ],
   "license": "MIT",
-  "homepage": "",
+  "homepage": "https://github.com/ACST-Innovation/ministryplatform-n8n",
   "author": {
-    "name": "",
-    "email": ""
+    "name": "ACST Innovation",
+    "email": "innovation@acst.com"
   },
   "repository": {
     "type": "git",
-    "url": ""
+    "url": "https://github.com/ACST-Innovation/ministryplatform-n8n.git"
   },
   "main": "index.js",
   "scripts": {
@@ -25,7 +33,9 @@
     "prepublishOnly": "npm run build && npm run lint -s"
   },
   "files": [
-    "dist"
+    "dist",
+    "README.md",
+    "LICENSE"
   ],
   "n8n": {
     "n8nNodesApiVersion": 1,
