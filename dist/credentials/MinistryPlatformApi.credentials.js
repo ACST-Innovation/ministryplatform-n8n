@@ -50,7 +50,7 @@ class MinistryPlatformApi {
     async preAuthentication(credentials) {
         const tokenResponse = await this.helpers.httpRequest({
             method: 'POST',
-            url: `${credentials.baseUrl}/oauth/connect/token`,
+            url: `${credentials.baseUrl}/ministryplatformapi/oauth/connect/token`,
             body: {
                 grant_type: 'client_credentials',
                 client_id: credentials.clientId,
