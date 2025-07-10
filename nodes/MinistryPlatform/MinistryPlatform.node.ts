@@ -3,9 +3,6 @@ import {
 	INodeExecutionData,
 	INodeType,
 	INodeTypeDescription,
-	NodeOperationError,
-	NodeConnectionType,
-	Icon,
 } from 'n8n-workflow';
 
 import { ministryPlatformApiRequest, ministryPlatformApiRequestAllItems } from './GenericFunctionsClientCredentials';
@@ -22,8 +19,8 @@ export class MinistryPlatform implements INodeType {
 		defaults: {
 			name: 'MinistryPlatform',
 		},
-		inputs: [NodeConnectionType.Main],
-		outputs: [NodeConnectionType.Main],
+		inputs: ['main'] as any,
+		outputs: ['main'] as any,
 		credentials: [
 			{
 				name: 'ministryPlatformApi',
@@ -43,6 +40,11 @@ export class MinistryPlatform implements INodeType {
 						action: 'Create a record',
 					},
 					{
+						name: 'Delete',
+						value: 'delete',
+						action: 'Delete a record',
+					},
+					{
 						name: 'Get',
 						value: 'get',
 						action: 'Get a record',
@@ -56,11 +58,6 @@ export class MinistryPlatform implements INodeType {
 						name: 'Update',
 						value: 'update',
 						action: 'Update a record',
-					},
-					{
-						name: 'Delete',
-						value: 'delete',
-						action: 'Delete a record',
 					},
 
 				],
@@ -136,11 +133,11 @@ export class MinistryPlatform implements INodeType {
 				},
 				options: [
 					{
-						displayName: 'Select',
-						name: 'select',
-						type: 'string',
-						default: '',
-						description: 'Comma-separated list of fields to select',
+						displayName: 'Distinct',
+						name: 'distinct',
+						type: 'boolean',
+						default: false,
+						description: 'Whether to return only distinct records',
 					},
 					{
 						displayName: 'Filter',
@@ -150,11 +147,11 @@ export class MinistryPlatform implements INodeType {
 						description: 'MS SQL WHERE clause syntax (e.g., "Contact_ID > 1000", "Email_Address=\'user@example.com\'")',
 					},
 					{
-						displayName: 'Order By',
-						name: 'orderby',
-						type: 'string',
-						default: '',
-						description: 'Field to order results by (e.g., "Display_Name asc")',
+						displayName: 'Global Filter ID',
+						name: 'globalFilterId',
+						type: 'number',
+						default: 0,
+						description: 'Global filter ID to apply',
 					},
 					{
 						displayName: 'Group By',
@@ -171,11 +168,18 @@ export class MinistryPlatform implements INodeType {
 						description: 'Having clause for grouped results',
 					},
 					{
-						displayName: 'Top',
-						name: 'top',
-						type: 'number',
-						default: 100,
-						description: 'Maximum number of records to return',
+						displayName: 'Order By',
+						name: 'orderby',
+						type: 'string',
+						default: '',
+						description: 'Field to order results by (e.g., "Display_Name asc")',
+					},
+					{
+						displayName: 'Select',
+						name: 'select',
+						type: 'string',
+						default: '',
+						description: 'Comma-separated list of fields to select',
 					},
 					{
 						displayName: 'Skip',
@@ -185,11 +189,11 @@ export class MinistryPlatform implements INodeType {
 						description: 'Number of records to skip for pagination',
 					},
 					{
-						displayName: 'Distinct',
-						name: 'distinct',
-						type: 'boolean',
-						default: false,
-						description: 'Return only distinct records',
+						displayName: 'Top',
+						name: 'top',
+						type: 'number',
+						default: 100,
+						description: 'Maximum number of records to return',
 					},
 					{
 						displayName: 'User ID',
@@ -197,13 +201,6 @@ export class MinistryPlatform implements INodeType {
 						type: 'number',
 						default: 0,
 						description: 'User ID for context-sensitive queries',
-					},
-					{
-						displayName: 'Global Filter ID',
-						name: 'globalFilterId',
-						type: 'number',
-						default: 0,
-						description: 'Global filter ID to apply',
 					},
 				],
 			},

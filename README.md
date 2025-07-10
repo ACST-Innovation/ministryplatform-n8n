@@ -1,12 +1,30 @@
-# ministryplatform-n8n
+# n8n-nodes-ministryplatform
+
+![n8n](https://img.shields.io/badge/n8n-Community%20Node-blue)
+![npm](https://img.shields.io/npm/v/n8n-nodes-ministryplatform)
+![license](https://img.shields.io/npm/l/n8n-nodes-ministryplatform)
 
 This is an n8n community node that lets you use MinistryPlatform in your n8n workflows.
 
-MinistryPlatform is a church management system that provides tools for managing contacts, events, donations, and more.
+[MinistryPlatform](https://ministryplatform.com/) is a comprehensive church management system that provides tools for managing contacts, events, donations, groups, and more. This integration allows you to automate workflows between MinistryPlatform and other systems.
 
 [n8n](https://n8n.io/) is a [fair-code licensed](https://docs.n8n.io/reference/license/) workflow automation platform.
 
+## Features
+
+- **Full CRUD Operations**: Create, Read, Update, and Delete records in any MinistryPlatform table
+- **OAuth2 Client Credentials**: Secure server-to-server authentication with automatic token management
+- **Advanced Filtering**: Use MS SQL syntax for complex queries
+- **Pagination Support**: Handle large datasets efficiently
+- **All Tables Supported**: Works with any table in your MinistryPlatform instance
+
 ## Installation
+
+### Community Nodes (Recommended)
+
+Follow the [installation guide](https://docs.n8n.io/integrations/community-nodes/installation/) for your n8n setup to install `n8n-nodes-ministryplatform`.
+
+### Manual Installation
 
 ### Docker Installation
 
@@ -79,18 +97,13 @@ Build a custom n8n image with the MinistryPlatform node pre-installed:
 
 ### NPM Installation
 
-Alternatively, install as a global npm package:
+For self-hosted n8n instances, you can install directly via npm:
 
 ```bash
-# Clone and build
-git clone https://github.com/ACST-Innovation/ministryplatform-n8n.git
-cd ministryplatform-n8n
-npm install
-npm run build
-
-# Install globally
-npm install -g .
+npm install n8n-nodes-ministryplatform
 ```
+
+Then restart your n8n instance to load the new node.
 
 ## Operations
 
@@ -161,24 +174,22 @@ Contact_ID IN (1001, 1002, 1003)
 
 ## Credentials
 
-This node uses OAuth2 authentication. You'll need to configure:
+This node uses OAuth2 Client Credentials flow for server-to-server authentication. You'll need to configure:
 
 ### MinistryPlatform OAuth App Setup
 1. Create an OAuth application in your MinistryPlatform instance
-2. Set the redirect URI to: `https://your-n8n-instance.com/rest/oauth2-credential/callback`
+2. Configure it for **Client Credentials** grant type (no redirect URI needed)
 3. Note down your Client ID and Client Secret
 
 ### n8n Credential Configuration
-In n8n, create new MinistryPlatform OAuth2 API credentials with:
+In n8n, create new MinistryPlatform API credentials with:
 
-1. **Environment URL**: Your MinistryPlatform base URL (e.g., `https://your-instance.ministryplatform.com`)
-2. **Authorization URL**: `https://your-instance.ministryplatform.com/ministryplatformapi/oauth/connect/authorize`
-3. **Access Token URL**: `https://your-instance.ministryplatform.com/ministryplatformapi/oauth/connect/token`
-4. **Client ID**: From your MinistryPlatform OAuth app
-5. **Client Secret**: From your MinistryPlatform OAuth app
-6. **Scope**: `http://www.thinkministry.com/dataplatform/scopes/all offline_access` (includes offline_access for refresh tokens)
+1. **Base URL**: Your MinistryPlatform base URL (e.g., `https://your-instance.ministryplatform.com`)
+2. **Client ID**: From your MinistryPlatform OAuth app
+3. **Client Secret**: From your MinistryPlatform OAuth app
+4. **Scope**: `http://www.thinkministry.com/dataplatform/scopes/all`
 
-**Note:** Replace `your-instance` with your actual MinistryPlatform subdomain.
+**Note:** Replace `your-instance` with your actual MinistryPlatform subdomain. This uses the Client Credentials flow which is ideal for server-to-server automation.
 
 ## Troubleshooting
 
@@ -188,11 +199,10 @@ In n8n, create new MinistryPlatform OAuth2 API credentials with:
 - Check n8n logs: `docker logs n8n`
 
 ### OAuth Issues
-- Verify OAuth URLs include `/ministryplatformapi` path
-- Check redirect URI matches n8n instance URL
-- Ensure MinistryPlatform OAuth app is configured correctly
-- **Token Expired**: If you get token expiration errors, reconnect your credentials in n8n to refresh the token
-- **Automatic Refresh**: n8n should automatically refresh expired tokens, but manual reconnection may be needed
+- Ensure MinistryPlatform OAuth app is configured for Client Credentials grant type
+- Verify Client ID and Client Secret are correct
+- Check that the scope `http://www.thinkministry.com/dataplatform/scopes/all` is properly configured
+- **Token Management**: Tokens are automatically managed and refreshed by the node
 
 ### Filter Issues
 - Use single quotes for string values: `Email_Address='user@example.com'`
@@ -232,6 +242,82 @@ A Postman collection is included in the `postman/` directory for testing the Min
 - **Documentation**: `postman/README.md`
 
 The collection includes examples for all operations (Create, Get, List, Update, Delete) with proper OAuth2 configuration.
+
+## Examples
+
+### List Contacts with Email Filtering
+Configure the MinistryPlatform node with:
+- **Operation**: List
+- **Table Name**: `Contacts`
+- **Additional Fields**:
+  - **Select**: `Contact_ID,Display_Name,Email_Address,Mobile_Phone`
+  - **Filter**: `Email_Address LIKE '%gmail.com%'`
+  - **Order By**: `Display_Name ASC`
+  - **Top**: `50`
+
+### Create New Contact
+Configure the MinistryPlatform node with:
+- **Operation**: Create
+- **Table Name**: `Contacts`
+- **Record Data**: 
+```json
+{
+  "Display_Name": "John Smith",
+  "Email_Address": "john.smith@example.com",
+  "Mobile_Phone": "555-123-4567",
+  "First_Name": "John",
+  "Last_Name": "Smith"
+}
+```
+
+### Update Contact Information
+Configure the MinistryPlatform node with:
+- **Operation**: Update
+- **Table Name**: `Contacts`
+- **Record ID**: `1234` (Contact_ID to update)
+- **Record Data**:
+```json
+{
+  "Email_Address": "newemail@example.com",
+  "Mobile_Phone": "555-987-6543"
+}
+```
+
+### Get Specific Event
+Configure the MinistryPlatform node with:
+- **Operation**: Get
+- **Table Name**: `Events`
+- **Record ID**: `789` (Event_ID)
+
+## Changelog
+
+### Version 1.0.1
+- Updated documentation for OAuth2 Client Credentials flow
+- Improved examples with step-by-step configuration
+- Enhanced error handling and token management
+- Updated branding and contact information
+- Fixed credential test authorization issue
+
+### Version 1.0.0
+- Initial release
+- Full CRUD operations for all MinistryPlatform tables
+- OAuth2 Client Credentials authentication
+- MS SQL syntax filtering
+- Pagination support
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## Support
+
+For issues and questions:
+- GitHub Issues: [Report a bug or request a feature](https://github.com/ACST-Innovation/ministryplatform-n8n/issues)
+- n8n Community: [Get help from the community](https://community.n8n.io/)
+
+## License
+
+MIT - see [LICENSE](LICENSE) file for details.
 
 ## Resources
 

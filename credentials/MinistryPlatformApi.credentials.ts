@@ -83,9 +83,9 @@ export class MinistryPlatformApi implements ICredentialType {
 	};
 
 	test: ICredentialTestRequest = {
-	request: {
-	 baseURL: '={{$credentials.baseUrl}}/ministryplatformapi',
-	  url: '/tables',
-	},
+		request: {
+			baseURL: '={{$credentials.baseUrl}}/ministryplatformapi',
+			url: '/tables',
+		},
 	};
 }
