@@ -27,6 +27,7 @@ export class MinistryPlatform implements INodeType {
 				required: true,
 			},
 		],
+		usableAsTool: true,
 		codex: {
 			categories: ['AI'],
 			subcategories: {

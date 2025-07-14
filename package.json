@@ -58,5 +58,8 @@
   },
   "peerDependencies": {
     "n8n-workflow": "*"
+  },
+  "dependencies": {
+    "@langchain/core": "^0.3.62"
   }
 }

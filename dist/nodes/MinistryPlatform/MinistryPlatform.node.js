@@ -22,6 +22,7 @@ class MinistryPlatform {
                 required: true,
             },
         ],
+        usableAsTool: true,
         codex: {
             categories: ['AI'],
             subcategories: {
