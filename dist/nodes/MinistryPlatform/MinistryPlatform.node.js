@@ -10,7 +10,7 @@ class MinistryPlatform {
         group: ['transform'],
         version: 1,
         subtitle: '={{$parameter["operation"] + ": " + $parameter["tableName"]}}',
-        description: 'Consume MinistryPlatform API',
+        description: 'Consume MinistryPlatform API for church management data operations',
         defaults: {
             name: 'MinistryPlatform',
         },
@@ -22,6 +22,20 @@ class MinistryPlatform {
                 required: true,
             },
         ],
+        usableAsTool: true,
+        codex: {
+            categories: ['AI'],
+            subcategories: {
+                AI: ['Tools'],
+            },
+            resources: {
+                primaryDocumentation: [
+                    {
+                        url: 'https://help.acst.com/en/ministryplatform/developer-resources/developer-resources',
+                    },
+                ],
+            },
+        },
         properties: [
             {
                 displayName: 'Operation',
@@ -32,27 +46,32 @@ class MinistryPlatform {
                     {
                         name: 'Create',
                         value: 'create',
-                        action: 'Create a record',
+                        action: 'Create a new record in MinistryPlatform',
+                        description: 'Creates a new record in the specified MinistryPlatform table with the provided field values',
                     },
                     {
                         name: 'Delete',
                         value: 'delete',
-                        action: 'Delete a record',
+                        action: 'Delete a record from MinistryPlatform',
+                        description: 'Deletes an existing record from the specified MinistryPlatform table using the record ID',
                     },
                     {
                         name: 'Get',
                         value: 'get',
-                        action: 'Get a record',
+                        action: 'Get a specific record from MinistryPlatform',
+                        description: 'Retrieves a single record from the specified MinistryPlatform table using the record ID',
                     },
                     {
                         name: 'List',
                         value: 'list',
-                        action: 'List records',
+                        action: 'List records from MinistryPlatform',
+                        description: 'Retrieves multiple records from the specified MinistryPlatform table with optional filtering, sorting, and pagination',
                     },
                     {
                         name: 'Update',
                         value: 'update',
-                        action: 'Update a record',
+                        action: 'Update a record in MinistryPlatform',
+                        description: 'Updates an existing record in the specified MinistryPlatform table with new field values',
                     },
                 ],
                 default: 'get',
@@ -63,7 +82,7 @@ class MinistryPlatform {
                 type: 'string',
                 default: '',
                 placeholder: 'Contacts',
-                description: 'Name of the MinistryPlatform table to interact with',
+                description: 'Name of the MinistryPlatform table to interact with. Common tables include: Contacts, Participants, Events, Households, Groups, Donations, Volunteers, etc.',
             },
             {
                 displayName: 'Record ID',
@@ -75,7 +94,7 @@ class MinistryPlatform {
                     },
                 },
                 default: '',
-                description: 'ID of the record to retrieve, update, or delete',
+                description: 'Unique identifier (primary key) of the record to retrieve, update, or delete. For most tables, this is the table name followed by "_ID" (e.g., Contact_ID, Event_ID)',
             },
             {
                 displayName: 'Fields',
@@ -138,7 +157,7 @@ class MinistryPlatform {
                         name: 'filter',
                         type: 'string',
                         default: '',
-                        description: 'MS SQL WHERE clause syntax (e.g., "Contact_ID > 1000", "Email_Address=\'user@example.com\'")',
+                        description: 'MS SQL WHERE clause syntax for filtering records. Examples: "Contact_ID > 1000", "Email_Address=\'user@example.com\'", "Display_Name LIKE \'%Smith%\'", "Created_Date >= \'2024-01-01\'"',
                     },
                     {
                         displayName: 'Global Filter ID',
