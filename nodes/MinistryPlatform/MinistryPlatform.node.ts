@@ -51,8 +51,8 @@ export class MinistryPlatform implements INodeType {
 					{
 						name: 'Create',
 						value: 'create',
-						action: 'Create a new record in MinistryPlatform',
-						description: 'Creates a new record in the specified MinistryPlatform table with the provided field values',
+						action: 'Create new records in MinistryPlatform',
+						description: 'Creates one or more new records in the specified MinistryPlatform table with the provided field values',
 					},
 					{
 						name: 'Delete',
@@ -75,8 +75,8 @@ export class MinistryPlatform implements INodeType {
 					{
 						name: 'Update',
 						value: 'update',
-						action: 'Update a record in MinistryPlatform',
-						description: 'Updates an existing record in the specified MinistryPlatform table with new field values',
+						action: 'Update records in MinistryPlatform',
+						description: 'Updates one or more existing records in the specified MinistryPlatform table with new field values',
 					},
 
 				],
@@ -96,48 +96,23 @@ export class MinistryPlatform implements INodeType {
 				type: 'string',
 				displayOptions: {
 					show: {
-						operation: ['get', 'update', 'delete'],
+						operation: ['get', 'delete'],
 					},
 				},
 				default: '',
-				description: 'Unique identifier (primary key) of the record to retrieve, update, or delete. For most tables, this is the table name followed by "_ID" (e.g., Contact_ID, Event_ID)',
+				description: 'Unique identifier (primary key) of the record to retrieve or delete. For most tables, this is the table name followed by "_ID" (e.g., Contact_ID, Event_ID)',
 			},
 			{
-				displayName: 'Fields',
-				name: 'fields',
-				placeholder: 'Add Field',
-				type: 'fixedCollection',
-				typeOptions: {
-					multipleValues: true,
-				},
+				displayName: 'Records',
+				name: 'records',
+				type: 'json',
 				displayOptions: {
 					show: {
 						operation: ['create', 'update'],
 					},
 				},
-				default: {},
-				options: [
-					{
-						name: 'field',
-						displayName: 'Field',
-						values: [
-							{
-								displayName: 'Field Name',
-								name: 'name',
-								type: 'string',
-								default: '',
-								description: 'Name of the field',
-							},
-							{
-								displayName: 'Field Value',
-								name: 'value',
-								type: 'string',
-								default: '',
-								description: 'Value of the field',
-							},
-						],
-					},
-				],
+				default: '[]',
+				description: 'Array of record objects to create or update. Each object should contain the field names and values for that record. Example: [{"Contact_ID": 159, "First_Name": "John", "Last_Name": "Doe"}, {"Contact_ID": 160, "First_Name": "Jane", "Last_Name": "Smith"}]',
 			},
 			{
 				displayName: 'Additional Fields',
@@ -238,11 +213,17 @@ export class MinistryPlatform implements INodeType {
 				const tableName = this.getNodeParameter('tableName', i) as string;
 
 				if (operation === 'create') {
-					const fields = this.getNodeParameter('fields.field', i, []) as Array<{name: string, value: string}>;
-					const body: any = {};
-					fields.forEach(field => {
-						body[field.name] = field.value;
-					});
+					const records = this.getNodeParameter('records', i) as string;
+					let body: any[];
+					
+					try {
+						body = JSON.parse(records);
+						if (!Array.isArray(body)) {
+							throw new Error('Records must be an array');
+						}
+					} catch (error) {
+						throw new Error(`Invalid JSON format in records: ${(error as Error).message}`);
+					}
 
 					responseData = await ministryPlatformApiRequest.call(this, 'POST', `/tables/${tableName}`, body);
 				} else if (operation === 'get') {
@@ -271,14 +252,19 @@ export class MinistryPlatform implements INodeType {
 						qs,
 					);
 				} else if (operation === 'update') {
-					const recordId = this.getNodeParameter('recordId', i) as string;
-					const fields = this.getNodeParameter('fields.field', i, []) as Array<{name: string, value: string}>;
-					const body: any = {};
-					fields.forEach(field => {
-						body[field.name] = field.value;
-					});
+					const records = this.getNodeParameter('records', i) as string;
+					let body: any[];
+					
+					try {
+						body = JSON.parse(records);
+						if (!Array.isArray(body)) {
+							throw new Error('Records must be an array');
+						}
+					} catch (error) {
+						throw new Error(`Invalid JSON format in records: ${(error as Error).message}`);
+					}
 
-					responseData = await ministryPlatformApiRequest.call(this, 'PUT', `/tables/${tableName}/${recordId}`, body);
+					responseData = await ministryPlatformApiRequest.call(this, 'PUT', `/tables/${tableName}`, body);
 				} else if (operation === 'delete') {
 					const recordId = this.getNodeParameter('recordId', i) as string;
 					responseData = await ministryPlatformApiRequest.call(this, 'DELETE', `/tables/${tableName}/${recordId}`);
