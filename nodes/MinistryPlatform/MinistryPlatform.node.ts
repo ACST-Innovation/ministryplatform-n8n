@@ -169,6 +169,13 @@ export class MinistryPlatform implements INodeType {
 						description: 'Field to order results by (e.g., "Display_Name asc")',
 					},
 					{
+						displayName: 'Search',
+						name: 'search',
+						type: 'string',
+						default: '',
+						description: 'Search term to find records containing this text across searchable fields',
+					},
+					{
 						displayName: 'Select',
 						name: 'select',
 						type: 'string',
@@ -238,6 +245,7 @@ export class MinistryPlatform implements INodeType {
 					if (additionalFields.orderby) qs.$orderby = additionalFields.orderby;
 					if (additionalFields.groupby) qs.$groupby = additionalFields.groupby;
 					if (additionalFields.having) qs.$having = additionalFields.having;
+					if (additionalFields.search) qs.$search = additionalFields.search;
 					if (additionalFields.top) qs.$top = additionalFields.top;
 					if (additionalFields.skip) qs.$skip = additionalFields.skip;
 					if (additionalFields.distinct) qs.$distinct = additionalFields.distinct;

@@ -163,6 +163,13 @@ class MinistryPlatform {
                         description: 'Field to order results by (e.g., "Display_Name asc")',
                     },
                     {
+                        displayName: 'Search',
+                        name: 'search',
+                        type: 'string',
+                        default: '',
+                        description: 'Search term to find records containing this text across searchable fields',
+                    },
+                    {
                         displayName: 'Select',
                         name: 'select',
                         type: 'string',
@@ -233,6 +240,8 @@ class MinistryPlatform {
                         qs.$groupby = additionalFields.groupby;
                     if (additionalFields.having)
                         qs.$having = additionalFields.having;
+                    if (additionalFields.search)
+                        qs.$search = additionalFields.search;
                     if (additionalFields.top)
                         qs.$top = additionalFields.top;
                     if (additionalFields.skip)
