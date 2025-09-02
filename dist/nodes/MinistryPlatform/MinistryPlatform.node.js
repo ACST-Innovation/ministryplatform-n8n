@@ -10,7 +10,7 @@ class MinistryPlatform {
         icon: 'file:ministryplatform.svg',
         group: ['transform'],
         version: 1,
-        subtitle: '={{$parameter["operation"] + ": " + $parameter["tableName"]}}',
+        subtitle: '={{$parameter["resource"] + " - " + $parameter["operation"]}}',
         description: 'Consume MinistryPlatform API for church management data operations',
         defaults: {
             name: 'MinistryPlatform',
@@ -26,10 +26,32 @@ class MinistryPlatform {
         usableAsTool: true,
         properties: [
             {
+                displayName: 'Resource',
+                name: 'resource',
+                type: 'options',
+                noDataExpression: true,
+                options: [
+                    {
+                        name: 'Table',
+                        value: 'table',
+                    },
+                    {
+                        name: 'Stored Procedure',
+                        value: 'storedProcedure',
+                    },
+                ],
+                default: 'table',
+            },
+            {
                 displayName: 'Operation',
                 name: 'operation',
                 type: 'options',
                 noDataExpression: true,
+                displayOptions: {
+                    show: {
+                        resource: ['table'],
+                    },
+                },
                 options: [
                     {
                         name: 'Create',
@@ -65,12 +87,57 @@ class MinistryPlatform {
                 default: 'get',
             },
             {
+                displayName: 'Operation',
+                name: 'operation',
+                type: 'options',
+                noDataExpression: true,
+                displayOptions: {
+                    show: {
+                        resource: ['storedProcedure'],
+                    },
+                },
+                options: [
+                    {
+                        name: 'Get All',
+                        value: 'procGetAll',
+                        action: 'Get all stored procedures',
+                        description: 'Returns the list of procedures available to the current users with basic metadata',
+                    },
+                    {
+                        name: 'Execute',
+                        value: 'procExecute',
+                        action: 'Execute a stored procedure',
+                        description: 'Executes the requested stored procedure with provided parameters',
+                    },
+                ],
+                default: 'procGetAll',
+            },
+            {
                 displayName: 'Table Name',
                 name: 'tableName',
                 type: 'string',
+                displayOptions: {
+                    show: {
+                        resource: ['table'],
+                    },
+                },
                 default: '',
                 placeholder: 'Contacts',
                 description: 'Name of the MinistryPlatform table to interact with. Common tables include: Contacts, Participants, Events, Households, Groups, Donations, Volunteers, etc.',
+            },
+            {
+                displayName: 'Stored Procedure',
+                name: 'storedProcedure',
+                type: 'string',
+                displayOptions: {
+                    show: {
+                        resource: ['storedProcedure'],
+                        operation: ['procExecute'],
+                    },
+                },
+                default: '',
+                placeholder: 'api_Common_GetLookupRecords',
+                description: 'Name of the stored procedure to execute',
             },
             {
                 displayName: 'Record ID',
@@ -78,6 +145,7 @@ class MinistryPlatform {
                 type: 'string',
                 displayOptions: {
                     show: {
+                        resource: ['table'],
                         operation: ['get', 'delete'],
                     },
                 },
@@ -90,6 +158,7 @@ class MinistryPlatform {
                 type: 'json',
                 displayOptions: {
                     show: {
+                        resource: ['table'],
                         operation: ['create', 'update'],
                     },
                 },
@@ -104,6 +173,7 @@ class MinistryPlatform {
                 default: {},
                 displayOptions: {
                     show: {
+                        resource: ['table'],
                         operation: ['list'],
                     },
                 },
@@ -187,78 +257,115 @@ class MinistryPlatform {
                     },
                 ],
             },
+            {
+                displayName: 'Parameters',
+                name: 'parameters',
+                type: 'json',
+                displayOptions: {
+                    show: {
+                        resource: ['storedProcedure'],
+                        operation: ['procExecute'],
+                    },
+                },
+                default: '{}',
+                description: 'JSON object containing the parameters to pass to the stored procedure. Example: {"DomainID": 1, "Congregation_ID": 5}.',
+            },
         ],
     };
     async execute() {
         const items = this.getInputData();
         const returnData = [];
+        const resource = this.getNodeParameter('resource', 0);
         const operation = this.getNodeParameter('operation', 0);
         for (let i = 0; i < items.length; i++) {
             try {
                 let responseData;
-                const tableName = this.getNodeParameter('tableName', i);
-                if (operation === 'create') {
-                    const records = this.getNodeParameter('records', i);
-                    let body;
-                    try {
-                        body = JSON.parse(records);
-                        if (!Array.isArray(body)) {
-                            throw new n8n_workflow_1.NodeOperationError(this.getNode(), 'Records must be an array');
+                if (resource === 'storedProcedure') {
+                    if (operation === 'procGetAll') {
+                        responseData = await GenericFunctionsClientCredentials_1.ministryPlatformApiRequest.call(this, 'GET', '/procs');
+                    }
+                    else if (operation === 'procExecute') {
+                        const storedProcedure = this.getNodeParameter('storedProcedure', i);
+                        const parameters = this.getNodeParameter('parameters', i);
+                        let body;
+                        try {
+                            body = JSON.parse(parameters);
                         }
-                    }
-                    catch (error) {
-                        throw new n8n_workflow_1.NodeOperationError(this.getNode(), `Invalid JSON format in records: ${error.message}`);
-                    }
-                    responseData = await GenericFunctionsClientCredentials_1.ministryPlatformApiRequest.call(this, 'POST', `/tables/${tableName}`, body);
-                }
-                else if (operation === 'get') {
-                    const recordId = this.getNodeParameter('recordId', i);
-                    responseData = await GenericFunctionsClientCredentials_1.ministryPlatformApiRequest.call(this, 'GET', `/tables/${tableName}/${recordId}`);
-                }
-                else if (operation === 'list') {
-                    const additionalFields = this.getNodeParameter('additionalFields', i);
-                    const qs = {};
-                    if (additionalFields.select)
-                        qs.$select = additionalFields.select;
-                    if (additionalFields.filter)
-                        qs.$filter = additionalFields.filter;
-                    if (additionalFields.orderby)
-                        qs.$orderby = additionalFields.orderby;
-                    if (additionalFields.groupby)
-                        qs.$groupby = additionalFields.groupby;
-                    if (additionalFields.having)
-                        qs.$having = additionalFields.having;
-                    if (additionalFields.search)
-                        qs.$search = additionalFields.search;
-                    if (additionalFields.top)
-                        qs.$top = additionalFields.top;
-                    if (additionalFields.skip)
-                        qs.$skip = additionalFields.skip;
-                    if (additionalFields.distinct)
-                        qs.$distinct = additionalFields.distinct;
-                    if (additionalFields.userId)
-                        qs.$userId = additionalFields.userId;
-                    if (additionalFields.globalFilterId)
-                        qs.$globalFilterId = additionalFields.globalFilterId;
-                    responseData = await GenericFunctionsClientCredentials_1.ministryPlatformApiRequestAllItems.call(this, 'GET', `/tables/${tableName}`, {}, qs);
-                }
-                else if (operation === 'update') {
-                    const records = this.getNodeParameter('records', i);
-                    let body;
-                    try {
-                        body = JSON.parse(records);
-                        if (!Array.isArray(body)) {
-                            throw new n8n_workflow_1.NodeOperationError(this.getNode(), 'Records must be an array');
+                        catch (error) {
+                            throw new n8n_workflow_1.NodeOperationError(this.getNode(), `Invalid JSON format in parameters: ${error.message}`);
                         }
+                        responseData = await GenericFunctionsClientCredentials_1.ministryPlatformApiRequest.call(this, 'POST', `/procs/${storedProcedure}`, body);
                     }
-                    catch (error) {
-                        throw new n8n_workflow_1.NodeOperationError(this.getNode(), `Invalid JSON format in records: ${error.message}`);
-                    }
-                    responseData = await GenericFunctionsClientCredentials_1.ministryPlatformApiRequest.call(this, 'PUT', `/tables/${tableName}`, body);
                 }
-                else if (operation === 'delete') {
-                    const recordId = this.getNodeParameter('recordId', i);
-                    responseData = await GenericFunctionsClientCredentials_1.ministryPlatformApiRequest.call(this, 'DELETE', `/tables/${tableName}/${recordId}`);
+                else if (resource === 'table') {
+                    if (operation === 'create') {
+                        const tableName = this.getNodeParameter('tableName', i);
+                        const records = this.getNodeParameter('records', i);
+                        let body;
+                        try {
+                            body = JSON.parse(records);
+                            if (!Array.isArray(body)) {
+                                throw new n8n_workflow_1.NodeOperationError(this.getNode(), 'Records must be an array');
+                            }
+                        }
+                        catch (error) {
+                            throw new n8n_workflow_1.NodeOperationError(this.getNode(), `Invalid JSON format in records: ${error.message}`);
+                        }
+                        responseData = await GenericFunctionsClientCredentials_1.ministryPlatformApiRequest.call(this, 'POST', `/tables/${tableName}`, body);
+                    }
+                    else if (operation === 'get') {
+                        const tableName = this.getNodeParameter('tableName', i);
+                        const recordId = this.getNodeParameter('recordId', i);
+                        responseData = await GenericFunctionsClientCredentials_1.ministryPlatformApiRequest.call(this, 'GET', `/tables/${tableName}/${recordId}`);
+                    }
+                    else if (operation === 'list') {
+                        const tableName = this.getNodeParameter('tableName', i);
+                        const additionalFields = this.getNodeParameter('additionalFields', i);
+                        const qs = {};
+                        if (additionalFields.select)
+                            qs.$select = additionalFields.select;
+                        if (additionalFields.filter)
+                            qs.$filter = additionalFields.filter;
+                        if (additionalFields.orderby)
+                            qs.$orderby = additionalFields.orderby;
+                        if (additionalFields.groupby)
+                            qs.$groupby = additionalFields.groupby;
+                        if (additionalFields.having)
+                            qs.$having = additionalFields.having;
+                        if (additionalFields.search)
+                            qs.$search = additionalFields.search;
+                        if (additionalFields.top)
+                            qs.$top = additionalFields.top;
+                        if (additionalFields.skip)
+                            qs.$skip = additionalFields.skip;
+                        if (additionalFields.distinct)
+                            qs.$distinct = additionalFields.distinct;
+                        if (additionalFields.userId)
+                            qs.$userId = additionalFields.userId;
+                        if (additionalFields.globalFilterId)
+                            qs.$globalFilterId = additionalFields.globalFilterId;
+                        responseData = await GenericFunctionsClientCredentials_1.ministryPlatformApiRequestAllItems.call(this, 'GET', `/tables/${tableName}`, {}, qs);
+                    }
+                    else if (operation === 'update') {
+                        const tableName = this.getNodeParameter('tableName', i);
+                        const records = this.getNodeParameter('records', i);
+                        let body;
+                        try {
+                            body = JSON.parse(records);
+                            if (!Array.isArray(body)) {
+                                throw new n8n_workflow_1.NodeOperationError(this.getNode(), 'Records must be an array');
+                            }
+                        }
+                        catch (error) {
+                            throw new n8n_workflow_1.NodeOperationError(this.getNode(), `Invalid JSON format in records: ${error.message}`);
+                        }
+                        responseData = await GenericFunctionsClientCredentials_1.ministryPlatformApiRequest.call(this, 'PUT', `/tables/${tableName}`, body);
+                    }
+                    else if (operation === 'delete') {
+                        const tableName = this.getNodeParameter('tableName', i);
+                        const recordId = this.getNodeParameter('recordId', i);
+                        responseData = await GenericFunctionsClientCredentials_1.ministryPlatformApiRequest.call(this, 'DELETE', `/tables/${tableName}/${recordId}`);
+                    }
                 }
                 const executionData = this.helpers.constructExecutionMetaData(this.helpers.returnJsonArray(responseData), { itemData: { item: i } });
                 returnData.push(...executionData);
