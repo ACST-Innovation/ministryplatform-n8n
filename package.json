@@ -1,6 +1,6 @@
 {
   "name": "n8n-nodes-ministryplatform-dev",
-  "version": "1.0.1",
+  "version": "1.0.4",
   "description": "n8n community node for MinistryPlatform - a powerful church management system integration supporting OAuth2 authentication and full CRUD operations on all MinistryPlatform tables",
   "keywords": [
     "n8n-community-node-package",

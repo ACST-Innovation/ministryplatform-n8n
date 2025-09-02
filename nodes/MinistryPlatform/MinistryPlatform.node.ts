@@ -29,19 +29,6 @@ export class MinistryPlatform implements INodeType {
 			},
 		],
 		usableAsTool: true,
-		codex: {
-			categories: ['AI'],
-			subcategories: {
-				AI: ['Tools'],
-			},
-			resources: {
-				primaryDocumentation: [
-					{
-						url: 'https://help.acst.com/en/ministryplatform/developer-resources/developer-resources',
-					},
-				],
-			},
-		},
 		properties: [
 			{
 				displayName: 'Operation',
