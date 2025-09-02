@@ -111,8 +111,8 @@ export class MinistryPlatform implements INodeType {
 					{
 						name: 'Get',
 						value: 'procGet',
-						action: 'Get a stored procedure definition',
-						description: 'Executes the requested stored procedure retrieving parameters from the query string',
+						action: 'Execute stored procedure with query string parameters',
+						description: 'Executes the requested stored procedure retrieving parameters from the query string.',
 					},
 					{
 						name: 'Execute',
