@@ -66,6 +66,24 @@ export class MinistryPlatform implements INodeType {
 						action: 'Update records',
 						description: 'Updates one or more existing records in the specified MinistryPlatform table with new field values',
 					},
+					{
+						name: 'Get All Stored Procedures',
+						value: 'procGetAll',
+						action: 'Get all stored procedures',
+						description: 'Returns the list of procedures available to the current users with basic metadata',
+					},
+					{
+						name: 'Get Stored Procedure',
+						value: 'procGet',
+						action: 'Get a stored procedure definition',
+						description: 'Executes the requested stored procedure retrieving parameters from the query string',
+					},
+					{
+						name: 'Execute Stored Procedure',
+						value: 'procExecute',
+						action: 'Execute a stored procedure',
+						description: 'Executes the requested stored procedure with provided parameters',
+					},
 
 				],
 				default: 'get',
@@ -74,9 +92,27 @@ export class MinistryPlatform implements INodeType {
 				displayName: 'Table Name',
 				name: 'tableName',
 				type: 'string',
+				displayOptions: {
+					show: {
+						operation: ['create', 'delete', 'get', 'list', 'update'],
+					},
+				},
 				default: '',
 				placeholder: 'Contacts',
 				description: 'Name of the MinistryPlatform table to interact with. Common tables include: Contacts, Participants, Events, Households, Groups, Donations, Volunteers, etc.',
+			},
+			{
+				displayName: 'Stored Procedure',
+				name: 'storedProcedure',
+				type: 'string',
+				displayOptions: {
+					show: {
+						operation: ['procGet', 'procExecute'],
+					},
+				},
+				default: '',
+				placeholder: 'api_Common_GetLookupRecords',
+				description: 'Name of the stored procedure to get or execute',
 			},
 			{
 				displayName: 'Record ID',
@@ -193,6 +229,18 @@ export class MinistryPlatform implements INodeType {
 					},
 				],
 			},
+			{
+				displayName: 'Parameters',
+				name: 'parameters',
+				type: 'json',
+				displayOptions: {
+					show: {
+						operation: ['procExecute'],
+					},
+				},
+				default: '{}',
+				description: 'JSON object containing the parameters to pass to the stored procedure. Example: {"DomainID": 1, "Congregation_ID": 5}',
+			},
 		],
 	};
 
@@ -205,9 +253,26 @@ export class MinistryPlatform implements INodeType {
 		for (let i = 0; i < items.length; i++) {
 			try {
 				let responseData;
-				const tableName = this.getNodeParameter('tableName', i) as string;
 
-				if (operation === 'create') {
+				if (operation === 'procGetAll') {
+					responseData = await ministryPlatformApiRequest.call(this, 'GET', '/procs');
+				} else if (operation === 'procGet') {
+					const storedProcedure = this.getNodeParameter('storedProcedure', i) as string;
+					responseData = await ministryPlatformApiRequest.call(this, 'GET', `/procs/${storedProcedure}`);
+				} else if (operation === 'procExecute') {
+					const storedProcedure = this.getNodeParameter('storedProcedure', i) as string;
+					const parameters = this.getNodeParameter('parameters', i) as string;
+					let body: any;
+					
+					try {
+						body = JSON.parse(parameters);
+					} catch (error) {
+						throw new NodeOperationError(this.getNode(), `Invalid JSON format in parameters: ${(error as Error).message}`);
+					}
+
+					responseData = await ministryPlatformApiRequest.call(this, 'POST', `/procs/${storedProcedure}`, body);
+				} else if (operation === 'create') {
+					const tableName = this.getNodeParameter('tableName', i) as string;
 					const records = this.getNodeParameter('records', i) as string;
 					let body: any[];
 					
@@ -222,9 +287,11 @@ export class MinistryPlatform implements INodeType {
 
 					responseData = await ministryPlatformApiRequest.call(this, 'POST', `/tables/${tableName}`, body);
 				} else if (operation === 'get') {
+					const tableName = this.getNodeParameter('tableName', i) as string;
 					const recordId = this.getNodeParameter('recordId', i) as string;
 					responseData = await ministryPlatformApiRequest.call(this, 'GET', `/tables/${tableName}/${recordId}`);
 				} else if (operation === 'list') {
+					const tableName = this.getNodeParameter('tableName', i) as string;
 					const additionalFields = this.getNodeParameter('additionalFields', i) as any;
 					const qs: any = {};
 
@@ -248,6 +315,7 @@ export class MinistryPlatform implements INodeType {
 						qs,
 					);
 				} else if (operation === 'update') {
+					const tableName = this.getNodeParameter('tableName', i) as string;
 					const records = this.getNodeParameter('records', i) as string;
 					let body: any[];
 					
@@ -262,6 +330,7 @@ export class MinistryPlatform implements INodeType {
 
 					responseData = await ministryPlatformApiRequest.call(this, 'PUT', `/tables/${tableName}`, body);
 				} else if (operation === 'delete') {
+					const tableName = this.getNodeParameter('tableName', i) as string;
 					const recordId = this.getNodeParameter('recordId', i) as string;
 					responseData = await ministryPlatformApiRequest.call(this, 'DELETE', `/tables/${tableName}/${recordId}`);
 				}
