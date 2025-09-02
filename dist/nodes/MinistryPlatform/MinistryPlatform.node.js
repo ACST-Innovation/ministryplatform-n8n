@@ -264,6 +264,20 @@ class MinistryPlatform {
                 ],
             },
             {
+                displayName: 'Query String',
+                name: 'queryString',
+                type: 'string',
+                displayOptions: {
+                    show: {
+                        resource: ['storedProcedure'],
+                        operation: ['procGet'],
+                    },
+                },
+                default: '',
+                placeholder: 'DomainID=1&Congregation_ID=5',
+                description: 'Query string parameters to pass to the stored procedure. Format: key=value&key2=value2',
+            },
+            {
                 displayName: 'Parameters',
                 name: 'parameters',
                 type: 'json',
@@ -292,7 +306,12 @@ class MinistryPlatform {
                     }
                     else if (operation === 'procGet') {
                         const storedProcedure = this.getNodeParameter('storedProcedure', i);
-                        responseData = await GenericFunctionsClientCredentials_1.ministryPlatformApiRequest.call(this, 'GET', `/procs/${storedProcedure}`);
+                        const queryString = this.getNodeParameter('queryString', i);
+                        let url = `/procs/${storedProcedure}`;
+                        if (queryString) {
+                            url += `?${queryString}`;
+                        }
+                        responseData = await GenericFunctionsClientCredentials_1.ministryPlatformApiRequest.call(this, 'GET', url);
                     }
                     else if (operation === 'procExecute') {
                         const storedProcedure = this.getNodeParameter('storedProcedure', i);

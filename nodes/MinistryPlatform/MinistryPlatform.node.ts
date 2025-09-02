@@ -269,6 +269,20 @@ export class MinistryPlatform implements INodeType {
 				],
 			},
 			{
+				displayName: 'Query String',
+				name: 'queryString',
+				type: 'string',
+				displayOptions: {
+					show: {
+						resource: ['storedProcedure'],
+						operation: ['procGet'],
+					},
+				},
+				default: '',
+				placeholder: 'DomainID=1&Congregation_ID=5',
+				description: 'Query string parameters to pass to the stored procedure. Format: key=value&key2=value2',
+			},
+			{
 				displayName: 'Parameters',
 				name: 'parameters',
 				type: 'json',
@@ -300,7 +314,14 @@ export class MinistryPlatform implements INodeType {
 						responseData = await ministryPlatformApiRequest.call(this, 'GET', '/procs');
 					} else if (operation === 'procGet') {
 						const storedProcedure = this.getNodeParameter('storedProcedure', i) as string;
-						responseData = await ministryPlatformApiRequest.call(this, 'GET', `/procs/${storedProcedure}`);
+						const queryString = this.getNodeParameter('queryString', i) as string;
+						
+						let url = `/procs/${storedProcedure}`;
+						if (queryString) {
+							url += `?${queryString}`;
+						}
+						
+						responseData = await ministryPlatformApiRequest.call(this, 'GET', url);
 					} else if (operation === 'procExecute') {
 						const storedProcedure = this.getNodeParameter('storedProcedure', i) as string;
 						const parameters = this.getNodeParameter('parameters', i) as string;
