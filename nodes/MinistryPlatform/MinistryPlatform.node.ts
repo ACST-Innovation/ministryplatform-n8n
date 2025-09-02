@@ -3,6 +3,7 @@ import {
 	INodeExecutionData,
 	INodeType,
 	INodeTypeDescription,
+	NodeOperationError,
 } from 'n8n-workflow';
 
 import { ministryPlatformApiRequest, ministryPlatformApiRequestAllItems } from './GenericFunctionsClientCredentials';
@@ -28,19 +29,6 @@ export class MinistryPlatform implements INodeType {
 			},
 		],
 		usableAsTool: true,
-		codex: {
-			categories: ['AI'],
-			subcategories: {
-				AI: ['Tools'],
-			},
-			resources: {
-				primaryDocumentation: [
-					{
-						url: 'https://help.acst.com/en/ministryplatform/developer-resources/developer-resources',
-					},
-				],
-			},
-		},
 		properties: [
 			{
 				displayName: 'Operation',
@@ -51,31 +39,31 @@ export class MinistryPlatform implements INodeType {
 					{
 						name: 'Create',
 						value: 'create',
-						action: 'Create new records in MinistryPlatform',
+						action: 'Create new records',
 						description: 'Creates one or more new records in the specified MinistryPlatform table with the provided field values',
 					},
 					{
 						name: 'Delete',
 						value: 'delete',
-						action: 'Delete a record from MinistryPlatform',
+						action: 'Delete a record',
 						description: 'Deletes an existing record from the specified MinistryPlatform table using the record ID',
 					},
 					{
 						name: 'Get',
 						value: 'get',
-						action: 'Get a specific record from MinistryPlatform',
+						action: 'Get a specific record',
 						description: 'Retrieves a single record from the specified MinistryPlatform table using the record ID',
 					},
 					{
 						name: 'List',
 						value: 'list',
-						action: 'List records from MinistryPlatform',
+						action: 'List records',
 						description: 'Retrieves multiple records from the specified MinistryPlatform table with optional filtering, sorting, and pagination',
 					},
 					{
 						name: 'Update',
 						value: 'update',
-						action: 'Update records in MinistryPlatform',
+						action: 'Update records',
 						description: 'Updates one or more existing records in the specified MinistryPlatform table with new field values',
 					},
 
@@ -100,7 +88,7 @@ export class MinistryPlatform implements INodeType {
 					},
 				},
 				default: '',
-				description: 'Unique identifier (primary key) of the record to retrieve or delete. For most tables, this is the table name followed by "_ID" (e.g., Contact_ID, Event_ID)',
+				description: 'Unique identifier (primary key) of the record to retrieve or delete. For most tables, this is the table name followed by "_ID" (e.g., Contact_ID, Event_ID).',
 			},
 			{
 				displayName: 'Records',
@@ -138,7 +126,7 @@ export class MinistryPlatform implements INodeType {
 						name: 'filter',
 						type: 'string',
 						default: '',
-						description: 'MS SQL WHERE clause syntax for filtering records. Examples: "Contact_ID > 1000", "Email_Address=\'user@example.com\'", "Display_Name LIKE \'%Smith%\'", "Created_Date >= \'2024-01-01\'"',
+						description: 'MS SQL WHERE clause syntax for filtering records. Examples: "Contact_ID > 1000", "Email_Address=\'user@example.com\'", "Display_Name LIKE \'%Smith%\'", "Created_Date >= \'2024-01-01\'".',
 					},
 					{
 						displayName: 'Global Filter ID',
@@ -226,10 +214,10 @@ export class MinistryPlatform implements INodeType {
 					try {
 						body = JSON.parse(records);
 						if (!Array.isArray(body)) {
-							throw new Error('Records must be an array');
+							throw new NodeOperationError(this.getNode(), 'Records must be an array');
 						}
 					} catch (error) {
-						throw new Error(`Invalid JSON format in records: ${(error as Error).message}`);
+						throw new NodeOperationError(this.getNode(), `Invalid JSON format in records: ${(error as Error).message}`);
 					}
 
 					responseData = await ministryPlatformApiRequest.call(this, 'POST', `/tables/${tableName}`, body);
@@ -266,10 +254,10 @@ export class MinistryPlatform implements INodeType {
 					try {
 						body = JSON.parse(records);
 						if (!Array.isArray(body)) {
-							throw new Error('Records must be an array');
+							throw new NodeOperationError(this.getNode(), 'Records must be an array');
 						}
 					} catch (error) {
-						throw new Error(`Invalid JSON format in records: ${(error as Error).message}`);
+						throw new NodeOperationError(this.getNode(), `Invalid JSON format in records: ${(error as Error).message}`);
 					}
 
 					responseData = await ministryPlatformApiRequest.call(this, 'PUT', `/tables/${tableName}`, body);
