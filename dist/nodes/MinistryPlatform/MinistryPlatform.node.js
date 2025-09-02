@@ -104,12 +104,6 @@ class MinistryPlatform {
                         description: 'Returns the list of procedures available to the current users with basic metadata',
                     },
                     {
-                        name: 'Get',
-                        value: 'procGet',
-                        action: 'Execute stored procedure with query string parameters',
-                        description: 'Executes the requested stored procedure retrieving parameters from the query string.',
-                    },
-                    {
                         name: 'Execute',
                         value: 'procExecute',
                         action: 'Execute a stored procedure',
@@ -138,12 +132,12 @@ class MinistryPlatform {
                 displayOptions: {
                     show: {
                         resource: ['storedProcedure'],
-                        operation: ['procGet', 'procExecute'],
+                        operation: ['procExecute'],
                     },
                 },
                 default: '',
                 placeholder: 'api_Common_GetLookupRecords',
-                description: 'Name of the stored procedure to get or execute',
+                description: 'Name of the stored procedure to execute',
             },
             {
                 displayName: 'Record ID',
@@ -264,20 +258,6 @@ class MinistryPlatform {
                 ],
             },
             {
-                displayName: 'Query String',
-                name: 'queryString',
-                type: 'string',
-                displayOptions: {
-                    show: {
-                        resource: ['storedProcedure'],
-                        operation: ['procGet'],
-                    },
-                },
-                default: '',
-                placeholder: 'DomainID=1&Congregation_ID=5',
-                description: 'Query string parameters to pass to the stored procedure. Format: key=value&key2=value2',
-            },
-            {
                 displayName: 'Parameters',
                 name: 'parameters',
                 type: 'json',
@@ -288,7 +268,7 @@ class MinistryPlatform {
                     },
                 },
                 default: '{}',
-                description: 'JSON object containing the parameters to pass to the stored procedure. Example: {"DomainID": 1, "Congregation_ID": 5}',
+                description: 'JSON object containing the parameters to pass to the stored procedure. Example: {"DomainID": 1, "Congregation_ID": 5}.',
             },
         ],
     };
@@ -303,15 +283,6 @@ class MinistryPlatform {
                 if (resource === 'storedProcedure') {
                     if (operation === 'procGetAll') {
                         responseData = await GenericFunctionsClientCredentials_1.ministryPlatformApiRequest.call(this, 'GET', '/procs');
-                    }
-                    else if (operation === 'procGet') {
-                        const storedProcedure = this.getNodeParameter('storedProcedure', i);
-                        const queryString = this.getNodeParameter('queryString', i);
-                        let url = `/procs/${storedProcedure}`;
-                        if (queryString) {
-                            url += `?${queryString}`;
-                        }
-                        responseData = await GenericFunctionsClientCredentials_1.ministryPlatformApiRequest.call(this, 'GET', url);
                     }
                     else if (operation === 'procExecute') {
                         const storedProcedure = this.getNodeParameter('storedProcedure', i);
