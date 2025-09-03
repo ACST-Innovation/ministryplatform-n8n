@@ -12,11 +12,14 @@ This is an n8n community node that lets you use MinistryPlatform in your n8n wor
 
 ## Features
 
+- **Organized Resource Interface**: Clean separation between Table and Stored Procedure operations
 - **Full CRUD Operations**: Create, Read, Update, and Delete records in any MinistryPlatform table
+- **Stored Procedure Support**: Execute stored procedures with parameters and retrieve all available procedures
 - **OAuth2 Client Credentials**: Secure server-to-server authentication with automatic token management
 - **Advanced Filtering**: Use MS SQL syntax for complex queries
 - **Pagination Support**: Handle large datasets efficiently
 - **All Tables Supported**: Works with any table in your MinistryPlatform instance
+- **AI Tool Compatible**: Can be used as a tool in AI workflows and agents
 
 ## Installation
 
@@ -107,22 +110,25 @@ Then restart your n8n instance to load the new node.
 
 ## Operations
 
-This node provides direct access to MinistryPlatform's table API, allowing you to work with any table in your MinistryPlatform instance.
+The MinistryPlatform node is organized into two main resources for better usability:
 
-### Table Operations Available
+### Table Operations
 
+Direct access to MinistryPlatform's table API, allowing you to work with any table in your MinistryPlatform instance.
+
+**Available Operations:**
 - **Create**: Add new records to any table
 - **Get**: Retrieve a specific record by ID
 - **List**: Retrieve multiple records with filtering and pagination
 - **Update**: Modify existing records
 - **Delete**: Remove records
 
-### Table Configuration
+**Table Configuration:**
 
 For all operations, you need to specify:
 - **Table Name**: The exact name of the MinistryPlatform table (e.g., `Contacts`, `Events`, `Donations`, `Households`)
 
-### List Operation Parameters
+**List Operation Parameters:**
 
 The List operation supports these query parameters:
 
@@ -136,6 +142,18 @@ The List operation supports these query parameters:
 - **distinct**: Return only unique records (boolean)
 - **userId**: User ID for context-sensitive queries
 - **globalFilterId**: Apply a global filter by ID
+
+### Stored Procedure Operations
+
+Access to MinistryPlatform's stored procedure API for executing predefined procedures.
+
+**Available Operations:**
+- **Get All**: Retrieve a list of all available stored procedures with metadata
+- **Execute**: Execute a specific stored procedure with JSON parameters
+
+**Stored Procedure Configuration:**
+- **Stored Procedure Name**: The name of the procedure to execute (e.g., `api_Common_GetLookupRecords`)
+- **Parameters**: JSON object containing parameters to pass to the procedure (e.g., `{"DomainID": 1, "Congregation_ID": 5}`)
 
 ### MS SQL Filter Examples
 
@@ -245,8 +263,11 @@ The collection includes examples for all operations (Create, Get, List, Update, 
 
 ## Examples
 
-### List Contacts with Email Filtering
+### Table Operations Examples
+
+#### List Contacts with Email Filtering
 Configure the MinistryPlatform node with:
+- **Resource**: Table
 - **Operation**: List
 - **Table Name**: `Contacts`
 - **Additional Fields**:
@@ -255,41 +276,73 @@ Configure the MinistryPlatform node with:
   - **Order By**: `Display_Name ASC`
   - **Top**: `50`
 
-### Create New Contact
+#### Create New Contact
 Configure the MinistryPlatform node with:
+- **Resource**: Table
 - **Operation**: Create
 - **Table Name**: `Contacts`
-- **Record Data**: 
+- **Records**: 
 ```json
-{
+[{
   "Display_Name": "John Smith",
   "Email_Address": "john.smith@example.com",
   "Mobile_Phone": "555-123-4567",
   "First_Name": "John",
   "Last_Name": "Smith"
-}
+}]
 ```
 
-### Update Contact Information
+#### Update Contact Information
 Configure the MinistryPlatform node with:
+- **Resource**: Table
 - **Operation**: Update
 - **Table Name**: `Contacts`
-- **Record ID**: `1234` (Contact_ID to update)
-- **Record Data**:
+- **Records**:
 ```json
-{
+[{
+  "Contact_ID": 1234,
   "Email_Address": "newemail@example.com",
   "Mobile_Phone": "555-987-6543"
-}
+}]
 ```
 
-### Get Specific Event
+#### Get Specific Event
 Configure the MinistryPlatform node with:
+- **Resource**: Table
 - **Operation**: Get
 - **Table Name**: `Events`
 - **Record ID**: `789` (Event_ID)
 
+### Stored Procedure Operations Examples
+
+#### Get All Available Stored Procedures
+Configure the MinistryPlatform node with:
+- **Resource**: Stored Procedure
+- **Operation**: Get All
+
+#### Execute Stored Procedure with Parameters
+Configure the MinistryPlatform node with:
+- **Resource**: Stored Procedure
+- **Operation**: Execute
+- **Stored Procedure**: `api_Common_GetLookupRecords`
+- **Parameters**:
+```json
+{
+  "DomainID": 1,
+  "Congregation_ID": 5,
+  "UserID": 123
+}
+```
+
 ## Changelog
+
+### Version 1.1.0
+- **NEW**: Organized interface with Resource → Operation structure (Table Actions / Stored Procedure Actions)
+- **NEW**: Stored Procedure support with Get All and Execute operations  
+- **NEW**: AI Tool compatibility for use in AI workflows and agents
+- **NEW**: Released to npm package registry
+- **IMPROVED**: Better parameter validation with proper n8n error types
+- **IMPROVED**: Updated documentation with new structure and examples
 
 ### Version 1.0.1
 - Updated documentation for OAuth2 Client Credentials flow
